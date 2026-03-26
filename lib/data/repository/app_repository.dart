@@ -23,55 +23,27 @@ class AppRepository {
   }
 
   List<AppItem> _getFallbackApps() {
-    return const [
-      AppItem(
-        name: 'Portfolio',
-        iconUrl: '',
-        link: 'https://github.com',
-        type: 'project',
-      ),
-      AppItem(
-        name: 'Weather App',
-        iconUrl: '',
-        link: 'https://github.com',
-        type: 'project',
-      ),
-      AppItem(
-        name: 'Chat App',
-        iconUrl: '',
-        link: 'https://github.com',
-        type: 'project',
-      ),
-      AppItem(
-        name: 'E-Commerce',
-        iconUrl: '',
-        link: 'https://github.com',
-        type: 'project',
-      ),
-      AppItem(
-        name: 'Notes App',
-        iconUrl: '',
-        link: 'https://github.com',
-        type: 'project',
-      ),
-      AppItem(
-        name: 'Fitness App',
-        iconUrl: '',
-        link: 'https://github.com',
-        type: 'project',
-      ),
-      AppItem(
-        name: 'Music Player',
-        iconUrl: '',
-        link: 'https://github.com',
-        type: 'project',
-      ),
-      AppItem(
-        name: 'Resume',
-        iconUrl: '',
-        link: 'https://drive.google.com',
-        type: 'resume',
-      ),
+    final projects = [
+      'Portfolio', 'Weather App', 'Chat App', 'E-Commerce', 'Notes App',
+      'Fitness App', 'Music Player', 'Recipe App', 'FinTrack', 'Travel Buddy',
+      'Book Shelf', 'Task Master', 'News Feed', 'Stock Watch', 'Garden AR',
+      'Photo Editor', 'Movie DB', 'Quiz Wiz', 'Pet Care', 'Home Auto'
     ];
+
+    final items = projects.map((name) => AppItem(
+      name: name,
+      iconUrl: '',
+      link: 'https://github.com',
+      type: 'project',
+    )).toList();
+
+    items.add(const AppItem(
+      name: 'Resume',
+      iconUrl: '',
+      link: 'https://drive.google.com',
+      type: 'resume',
+    ));
+
+    return items;
   }
 }

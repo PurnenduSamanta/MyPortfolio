@@ -8,6 +8,7 @@ import '../widgets/search_bar_widget.dart';
 import '../widgets/app_grid.dart';
 import '../widgets/dock_bar.dart';
 import '../widgets/navigation_bar_widget.dart';
+import '../widgets/notification_panel.dart';
 
 class HomeScreen extends StatefulWidget {
   final ThemeProvider themeProvider;
@@ -18,20 +19,86 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
   final AppRepository _repository = AppRepository();
-  late Future<List<AppItem>> _appsFuture;
+  final TextEditingController _searchController = TextEditingController();
+  
+  List<AppItem> _allApps = [];
+  List<AppItem> _filteredApps = [];
+  bool _isLoading = true;
+  String? _error;
+
+  // Notification Panel Animation
+  late AnimationController _notifController;
+  late Animation<Offset> _notifSlide;
+  bool _isNotifOpen = false;
 
   @override
   void initState() {
     super.initState();
-    _appsFuture = _repository.getApps();
+    _loadApps();
+
+    _notifController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 400),
+    );
+    _notifSlide = Tween<Offset>(
+      begin: const Offset(0, -1),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _notifController,
+      curve: Curves.easeOutQuart,
+    ));
   }
 
-  Future<void> _refresh() async {
-    _repository.clearCache();
+  @override
+  void dispose() {
+    _searchController.dispose();
+    _notifController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _loadApps() async {
     setState(() {
-      _appsFuture = _repository.getApps();
+      _isLoading = true;
+      _error = null;
+    });
+    try {
+      final apps = await _repository.getApps();
+      setState(() {
+        _allApps = apps;
+        _filteredApps = apps;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _error = e.toString();
+        _isLoading = false;
+      });
+    }
+  }
+
+  void _onSearch(String query) {
+    setState(() {
+      if (query.isEmpty) {
+        _filteredApps = _allApps;
+      } else {
+        _filteredApps = _allApps
+            .where((app) =>
+                app.name.toLowerCase().contains(query.toLowerCase()))
+            .toList();
+      }
+    });
+  }
+
+  void _toggleNotif() {
+    setState(() {
+      _isNotifOpen = !_isNotifOpen;
+      if (_isNotifOpen) {
+        _notifController.forward();
+      } else {
+        _notifController.reverse();
+      }
     });
   }
 
@@ -42,52 +109,83 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Container(
       color: bgColor,
-      child: SafeArea(
-        child: Column(
-          children: [
-            // Status Bar
-            const StatusBarWidget(),
+      child: Stack(
+        children: [
+          // Main Home Screen Content
+          SafeArea(
+            child: Column(
+              children: [
+                // Status Bar + Top Gesture Area
+                GestureDetector(
+                  onVerticalDragUpdate: (details) {
+                    if (details.primaryDelta! > 10 && !_isNotifOpen) {
+                      _toggleNotif();
+                    }
+                  },
+                  onTap: _toggleNotif,
+                  child: const StatusBarWidget(),
+                ),
 
-            const SizedBox(height: 8),
+                const SizedBox(height: 8),
 
-            // Search Bar
-            const SearchBarWidget(),
+                // Search Bar
+                SearchBarWidget(
+                  controller: _searchController,
+                  onSearch: _onSearch,
+                ),
 
-            const SizedBox(height: 8),
+                const SizedBox(height: 8),
 
-            // App Grid (expandable)
-            Expanded(
-              child: FutureBuilder<List<AppItem>>(
-                future: _appsFuture,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return _buildLoadingState(isDark);
-                  }
-                  if (snapshot.hasError) {
-                    return _buildErrorState(isDark);
-                  }
-                  final apps = snapshot.data ?? [];
-                  if (apps.isEmpty) {
-                    return _buildEmptyState(isDark);
-                  }
-                  return RefreshIndicator(
-                    onRefresh: _refresh,
-                    color: isDark
-                        ? AppColors.darkPrimary
-                        : AppColors.lightPrimary,
-                    child: AppGrid(apps: apps),
-                  );
-                },
-              ),
+                // Main Content
+                Expanded(
+                  child: _isLoading
+                      ? _buildLoadingState(isDark)
+                      : _error != null
+                          ? _buildErrorState(isDark)
+                          : _filteredApps.isEmpty
+                              ? _buildEmptyState(isDark)
+                              : RefreshIndicator(
+                                  onRefresh: _loadApps,
+                                  color: isDark
+                                      ? AppColors.darkPrimary
+                                      : AppColors.lightPrimary,
+                                  child: AppGrid(apps: _filteredApps),
+                                ),
+                ),
+
+                // Dock Bar
+                DockBar(themeProvider: widget.themeProvider),
+
+                // Navigation Bar
+                const NavigationBarWidget(),
+              ],
             ),
+          ),
 
-            // Dock Bar
-            DockBar(themeProvider: widget.themeProvider),
-
-            // Navigation Bar
-            const NavigationBarWidget(),
-          ],
-        ),
+          // Notification Panel Overlay
+          AnimatedBuilder(
+            animation: _notifController,
+            builder: (context, child) {
+              final isVisible = _notifController.value > 0;
+              return IgnorePointer(
+                ignoring: !isVisible,
+                child: Opacity(
+                  opacity: _notifController.value,
+                  child: SlideTransition(
+                    position: _notifSlide,
+                    child: child,
+                  ),
+                ),
+              );
+            },
+            child: NotificationPanel(
+              onClose: _toggleNotif,
+              resumeLink: _allApps.isNotEmpty 
+                  ? _allApps.firstWhere((a) => a.isResume, orElse: () => _allApps.first).link 
+                  : "https://google.com",
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -145,7 +243,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           const SizedBox(height: 8),
           TextButton.icon(
-            onPressed: _refresh,
+            onPressed: _loadApps,
             icon: const Icon(Icons.refresh_rounded, size: 18),
             label: const Text('Retry'),
           ),
@@ -168,7 +266,9 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           const SizedBox(height: 12),
           Text(
-            'No apps installed',
+            _searchController.text.isNotEmpty 
+                ? 'No matching apps' 
+                : 'No apps installed',
             style: TextStyle(
               color: isDark
                   ? AppColors.darkOnSurface
