@@ -23,7 +23,9 @@ class SearchBarWidget extends StatelessWidget {
           color: isDark ? AppColors.darkSearchBar : AppColors.lightSearchBar,
           borderRadius: BorderRadius.circular(24),
           border: Border.all(
-            color: (isDark ? Colors.white : Colors.black).withValues(alpha: 0.08),
+            color: (isDark ? Colors.white : Colors.black).withValues(
+              alpha: 0.08,
+            ),
             width: 0.5,
           ),
         ),
@@ -34,6 +36,7 @@ class SearchBarWidget extends StatelessWidget {
           style: TextStyle(
             color: isDark ? AppColors.darkOnSurface : AppColors.lightOnSurface,
             fontSize: 14,
+            height: 1.25,
           ),
           decoration: InputDecoration(
             isDense: true,
@@ -45,44 +48,50 @@ class SearchBarWidget extends StatelessWidget {
               fontSize: 14,
               fontWeight: FontWeight.w400,
             ),
-            prefixIcon: Padding(
-              padding: const EdgeInsets.only(left: 14, right: 10),
-              child: Icon(
-                Icons.search_rounded,
-                color: isDark
-                    ? AppColors.darkOnSurfaceVariant
-                    : AppColors.lightOnSurfaceVariant,
-                size: 20,
-              ),
+            prefixIcon: Icon(
+              Icons.search_rounded,
+              color: isDark
+                  ? AppColors.darkOnSurfaceVariant
+                  : AppColors.lightOnSurfaceVariant,
+              size: 20,
             ),
-            prefixIconConstraints: const BoxConstraints(minWidth: 44),
-            suffixIcon: Padding(
-              padding: const EdgeInsets.only(right: 6),
-              child: controller.text.isNotEmpty
-                  ? IconButton(
-                      icon: Icon(
-                        Icons.close_rounded,
-                        color: isDark
-                            ? AppColors.darkOnSurfaceVariant
-                            : AppColors.lightOnSurfaceVariant,
-                        size: 18,
-                      ),
-                      onPressed: () {
-                        controller.clear();
-                        onSearch('');
-                      },
-                    )
-                  : Icon(
-                      Icons.mic_none_rounded,
+            prefixIconConstraints: const BoxConstraints(
+              minWidth: 46,
+              minHeight: 44,
+            ),
+            suffixIcon: controller.text.isNotEmpty
+                ? IconButton(
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints.tightFor(
+                      width: 44,
+                      height: 44,
+                    ),
+                    splashRadius: 18,
+                    icon: Icon(
+                      Icons.close_rounded,
                       color: isDark
                           ? AppColors.darkOnSurfaceVariant
                           : AppColors.lightOnSurfaceVariant,
-                      size: 20,
+                      size: 18,
                     ),
+                    onPressed: () {
+                      controller.clear();
+                      onSearch('');
+                    },
+                  )
+                : Icon(
+                    Icons.mic_none_rounded,
+                    color: isDark
+                        ? AppColors.darkOnSurfaceVariant
+                        : AppColors.lightOnSurfaceVariant,
+                    size: 20,
+                  ),
+            suffixIconConstraints: const BoxConstraints(
+              minWidth: 44,
+              minHeight: 44,
             ),
-            suffixIconConstraints: const BoxConstraints(minWidth: 44),
             border: InputBorder.none,
-            contentPadding: EdgeInsets.zero,
+            contentPadding: const EdgeInsets.symmetric(vertical: 11),
           ),
         ),
       ),

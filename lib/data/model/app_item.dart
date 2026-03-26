@@ -15,7 +15,7 @@ class AppItem {
 
   factory AppItem.fromCsvRow(List<String> row) {
     return AppItem(
-      name: row.length > 0 ? row[0].trim() : '',
+      name: row.isNotEmpty ? row[0].trim() : '',
       iconUrl: row.length > 1 ? row[1].trim() : '',
       link: row.length > 2 ? row[2].trim() : '',
       type: row.length > 3 ? row[3].trim() : 'project',

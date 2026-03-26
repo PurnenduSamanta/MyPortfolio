@@ -2,13 +2,16 @@ import 'package:flutter/material.dart';
 import '../../core/theme/app_colors.dart';
 
 class StatusBarWidget extends StatelessWidget {
-  const StatusBarWidget({super.key});
+  final VoidCallback? onNotificationTap;
+
+  const StatusBarWidget({super.key, this.onNotificationTap});
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textColor =
-        isDark ? AppColors.darkOnSurface : AppColors.lightOnSurface;
+    final textColor = isDark
+        ? AppColors.darkOnSurface
+        : AppColors.lightOnSurface;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
@@ -28,6 +31,19 @@ class StatusBarWidget extends StatelessWidget {
           // Status icons
           Row(
             children: [
+              GestureDetector(
+                onTap: onNotificationTap,
+                behavior: HitTestBehavior.translucent,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 2),
+                  child: Icon(
+                    Icons.keyboard_arrow_down_rounded,
+                    color: textColor,
+                    size: 18,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 4),
               // Signal
               Icon(Icons.signal_cellular_alt, color: textColor, size: 16),
               const SizedBox(width: 6),
@@ -45,7 +61,9 @@ class StatusBarWidget extends StatelessWidget {
 
   String _getFormattedTime() {
     final now = DateTime.now();
-    final hour = now.hour > 12 ? now.hour - 12 : (now.hour == 0 ? 12 : now.hour);
+    final hour = now.hour > 12
+        ? now.hour - 12
+        : (now.hour == 0 ? 12 : now.hour);
     final minute = now.minute.toString().padLeft(2, '0');
     return '$hour:$minute';
   }

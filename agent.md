@@ -86,6 +86,16 @@ Avoid over-engineering. DO NOT implement:
     - Includes Micro-storytelling section ("Daily Pulse").
     - Includes Tap-to-view Resume notification (Last updated: Jan 2026).
     - Includes a heavily blurred `BackdropFilter` background.
+- Fixed **Issue #1 (Web Gesture Reliability)**:
+    - Added explicit open/close notification actions to prevent drag-toggle jitter.
+    - Added pull-down / swipe-up drag thresholds for stable panel interactions.
+    - Enabled mouse drag devices globally for Flutter scrollables.
+    - Added desktop fallback previous/next page controls for App Grid pagination.
+- UI polish + dock behavior update:
+    - Corrected Search Bar content alignment for icon/text vertical balance.
+    - Wired dock GitHub/Email/LinkedIn icons to launch dummy links (theme toggle unchanged).
+- Dev tooling fix:
+    - Replaced invalid VS Code Chrome URL launcher with proper Flutter debug configurations in `.vscode/launch.json` (`Flutter (Chrome)` + `Flutter (Web Server)`).
 
 ---
 
@@ -95,13 +105,13 @@ The following items are known bugs or features not working smoothly. Read this b
 
 1. **Gestures/Swiping in Flutter Web**: 
    - *Issue*: Dragging the Notification Panel down from the top status bar or swiping the `AppGrid` is glitchy/unreliable using a mouse cursor in a browser environment. Standard web pointer events often conflict with Flutter's gesture arenas.
-   - *Fix Needed*: We may need to refine mouse-drag sensitivity for `PageView` and `GestureDetector` (drag update) or implement fallback button clicks to explicitly open panels on desktop environments where trackpads aren't used.
+   - *Status*: ✅ Resolved on March 26, 2026 (thresholded gestures + explicit desktop fallback controls + web drag-device support).
 2. **Google Sheet Link Missing**:
    - *Issue*: `lib/services/sheet_service.dart` is missing a valid Google Sheets published CSV link.
    - *Fix Needed*: Add the real URL to fetch portfolio data dynamically.
 3. **External Dock Links**:
    - *Issue*: `dock_bar.dart` has GitHub and Email icons, but their `onTap` events are empty `() {}`.
-   - *Fix Needed*: Update these to handle `url_launcher` intents.
+   - *Status*: ✅ Resolved on March 26, 2026 with dummy launch URLs (replace with real links later).
 
 ---
 

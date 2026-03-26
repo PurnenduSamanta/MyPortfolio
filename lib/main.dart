@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/gestures.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_provider.dart';
 import 'ui/screens/main_screen.dart';
@@ -31,10 +32,25 @@ class _MyPortfolioAppState extends State<MyPortfolioApp> {
     return MaterialApp(
       title: 'My Portfolio',
       debugShowCheckedModeBanner: false,
+      scrollBehavior: const _WebDragScrollBehavior(),
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: _themeProvider.themeMode,
       home: MainScreen(themeProvider: _themeProvider),
     );
   }
+}
+
+class _WebDragScrollBehavior extends MaterialScrollBehavior {
+  const _WebDragScrollBehavior();
+
+  @override
+  Set<PointerDeviceKind> get dragDevices => {
+    PointerDeviceKind.touch,
+    PointerDeviceKind.mouse,
+    PointerDeviceKind.stylus,
+    PointerDeviceKind.invertedStylus,
+    PointerDeviceKind.trackpad,
+    PointerDeviceKind.unknown,
+  };
 }

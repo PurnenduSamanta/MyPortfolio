@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/theme_provider.dart';
 
@@ -6,6 +7,13 @@ class DockBar extends StatelessWidget {
   final ThemeProvider themeProvider;
 
   const DockBar({super.key, required this.themeProvider});
+
+  Future<void> _openLink(String link) async {
+    final uri = Uri.parse(link);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -15,8 +23,9 @@ class DockBar extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       decoration: BoxDecoration(
-        color: (isDark ? AppColors.darkDock : AppColors.lightDock)
-            .withValues(alpha: 0.85),
+        color: (isDark ? AppColors.darkDock : AppColors.lightDock).withValues(
+          alpha: 0.85,
+        ),
         borderRadius: BorderRadius.circular(28),
         border: Border.all(
           color: (isDark ? Colors.white : Colors.black).withValues(alpha: 0.08),
@@ -37,23 +46,20 @@ class DockBar extends StatelessWidget {
             icon: Icons.code_rounded,
             label: 'GitHub',
             isDark: isDark,
-            onTap: () {},
+            onTap: () => _openLink('https://example.com/github'),
           ),
           _DockIcon(
             icon: Icons.email_rounded,
             label: 'Email',
             isDark: isDark,
-            onTap: () {},
+            onTap: () => _openLink('mailto:hello@example.com'),
           ),
-          _ThemeToggleIcon(
-            themeProvider: themeProvider,
-            isDark: isDark,
-          ),
+          _ThemeToggleIcon(themeProvider: themeProvider, isDark: isDark),
           _DockIcon(
             icon: Icons.link_rounded,
             label: 'LinkedIn',
             isDark: isDark,
-            onTap: () {},
+            onTap: () => _openLink('https://example.com/linkedin'),
           ),
         ],
       ),
@@ -90,9 +96,10 @@ class _DockIconState extends State<_DockIcon>
       duration: const Duration(milliseconds: 120),
       vsync: this,
     );
-    _scale = Tween<double>(begin: 1.0, end: 0.85).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
+    _scale = Tween<double>(
+      begin: 1.0,
+      end: 0.85,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
   }
 
   @override
@@ -112,18 +119,17 @@ class _DockIconState extends State<_DockIcon>
       onTapCancel: () => _controller.reverse(),
       child: AnimatedBuilder(
         animation: _scale,
-        builder: (context, child) => Transform.scale(
-          scale: _scale.value,
-          child: child,
-        ),
+        builder: (context, child) =>
+            Transform.scale(scale: _scale.value, child: child),
         child: Tooltip(
           message: widget.label,
           child: Container(
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-              color: (widget.isDark ? Colors.white : Colors.black)
-                  .withValues(alpha: 0.08),
+              color: (widget.isDark ? Colors.white : Colors.black).withValues(
+                alpha: 0.08,
+              ),
               borderRadius: BorderRadius.circular(14),
             ),
             child: Icon(
@@ -144,10 +150,7 @@ class _ThemeToggleIcon extends StatefulWidget {
   final ThemeProvider themeProvider;
   final bool isDark;
 
-  const _ThemeToggleIcon({
-    required this.themeProvider,
-    required this.isDark,
-  });
+  const _ThemeToggleIcon({required this.themeProvider, required this.isDark});
 
   @override
   State<_ThemeToggleIcon> createState() => _ThemeToggleIconState();
@@ -166,15 +169,14 @@ class _ThemeToggleIconState extends State<_ThemeToggleIcon>
       duration: const Duration(milliseconds: 350),
       vsync: this,
     );
-    _rotation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
+    _rotation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
     _scale = TweenSequence<double>([
       TweenSequenceItem(tween: Tween(begin: 1.0, end: 0.7), weight: 50),
       TweenSequenceItem(tween: Tween(begin: 0.7, end: 1.0), weight: 50),
-    ]).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
+    ]).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
   }
 
   @override

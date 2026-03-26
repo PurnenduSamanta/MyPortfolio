@@ -19,10 +19,11 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
+class _HomeScreenState extends State<HomeScreen>
+    with SingleTickerProviderStateMixin {
   final AppRepository _repository = AppRepository();
   final TextEditingController _searchController = TextEditingController();
-  
+
   List<AppItem> _allApps = [];
   List<AppItem> _filteredApps = [];
   bool _isLoading = true;
@@ -32,6 +33,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   late AnimationController _notifController;
   late Animation<Offset> _notifSlide;
   bool _isNotifOpen = false;
+  double _statusBarDragDistance = 0;
+  bool _statusBarDragTriggered = false;
 
   @override
   void initState() {
@@ -42,13 +45,10 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       vsync: this,
       duration: const Duration(milliseconds: 400),
     );
-    _notifSlide = Tween<Offset>(
-      begin: const Offset(0, -1),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _notifController,
-      curve: Curves.easeOutQuart,
-    ));
+    _notifSlide = Tween<Offset>(begin: const Offset(0, -1), end: Offset.zero)
+        .animate(
+          CurvedAnimation(parent: _notifController, curve: Curves.easeOutQuart),
+        );
   }
 
   @override
@@ -84,28 +84,58 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         _filteredApps = _allApps;
       } else {
         _filteredApps = _allApps
-            .where((app) =>
-                app.name.toLowerCase().contains(query.toLowerCase()))
+            .where(
+              (app) => app.name.toLowerCase().contains(query.toLowerCase()),
+            )
             .toList();
       }
     });
   }
 
-  void _toggleNotif() {
+  void _openNotif() {
+    if (_isNotifOpen) return;
     setState(() {
-      _isNotifOpen = !_isNotifOpen;
-      if (_isNotifOpen) {
-        _notifController.forward();
-      } else {
-        _notifController.reverse();
-      }
+      _isNotifOpen = true;
     });
+    _notifController.forward();
+  }
+
+  void _closeNotif() {
+    if (!_isNotifOpen) return;
+    setState(() {
+      _isNotifOpen = false;
+    });
+    _notifController.reverse();
+  }
+
+  void _onStatusBarDragStart(DragStartDetails details) {
+    _statusBarDragDistance = 0;
+    _statusBarDragTriggered = false;
+  }
+
+  void _onStatusBarDragUpdate(DragUpdateDetails details) {
+    if (_isNotifOpen || _statusBarDragTriggered) return;
+    final delta = details.primaryDelta ?? 0;
+    if (delta <= 0) return;
+
+    _statusBarDragDistance += delta;
+    if (_statusBarDragDistance >= 24) {
+      _statusBarDragTriggered = true;
+      _openNotif();
+    }
+  }
+
+  void _onStatusBarDragEnd(DragEndDetails details) {
+    _statusBarDragDistance = 0;
+    _statusBarDragTriggered = false;
   }
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgColor = isDark ? AppColors.darkBackground : AppColors.lightBackground;
+    final bgColor = isDark
+        ? AppColors.darkBackground
+        : AppColors.lightBackground;
 
     return Container(
       color: bgColor,
@@ -117,13 +147,22 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               children: [
                 // Status Bar + Top Gesture Area
                 GestureDetector(
-                  onVerticalDragUpdate: (details) {
-                    if (details.primaryDelta! > 10 && !_isNotifOpen) {
-                      _toggleNotif();
+                  behavior: HitTestBehavior.translucent,
+                  onVerticalDragStart: _onStatusBarDragStart,
+                  onVerticalDragUpdate: _onStatusBarDragUpdate,
+                  onVerticalDragEnd: _onStatusBarDragEnd,
+                  onTap: () {
+                    if (!_isNotifOpen) {
+                      _openNotif();
                     }
                   },
-                  onTap: _toggleNotif,
-                  child: const StatusBarWidget(),
+                  child: StatusBarWidget(
+                    onNotificationTap: () {
+                      if (!_isNotifOpen) {
+                        _openNotif();
+                      }
+                    },
+                  ),
                 ),
 
                 const SizedBox(height: 8),
@@ -141,16 +180,16 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                   child: _isLoading
                       ? _buildLoadingState(isDark)
                       : _error != null
-                          ? _buildErrorState(isDark)
-                          : _filteredApps.isEmpty
-                              ? _buildEmptyState(isDark)
-                              : RefreshIndicator(
-                                  onRefresh: _loadApps,
-                                  color: isDark
-                                      ? AppColors.darkPrimary
-                                      : AppColors.lightPrimary,
-                                  child: AppGrid(apps: _filteredApps),
-                                ),
+                      ? _buildErrorState(isDark)
+                      : _filteredApps.isEmpty
+                      ? _buildEmptyState(isDark)
+                      : RefreshIndicator(
+                          onRefresh: _loadApps,
+                          color: isDark
+                              ? AppColors.darkPrimary
+                              : AppColors.lightPrimary,
+                          child: AppGrid(apps: _filteredApps),
+                        ),
                 ),
 
                 // Dock Bar
@@ -171,17 +210,19 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                 ignoring: !isVisible,
                 child: Opacity(
                   opacity: _notifController.value,
-                  child: SlideTransition(
-                    position: _notifSlide,
-                    child: child,
-                  ),
+                  child: SlideTransition(position: _notifSlide, child: child),
                 ),
               );
             },
             child: NotificationPanel(
-              onClose: _toggleNotif,
-              resumeLink: _allApps.isNotEmpty 
-                  ? _allApps.firstWhere((a) => a.isResume, orElse: () => _allApps.first).link 
+              onClose: _closeNotif,
+              resumeLink: _allApps.isNotEmpty
+                  ? _allApps
+                        .firstWhere(
+                          (a) => a.isResume,
+                          orElse: () => _allApps.first,
+                        )
+                        .link
                   : "https://google.com",
             ),
           ),
@@ -266,8 +307,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           ),
           const SizedBox(height: 12),
           Text(
-            _searchController.text.isNotEmpty 
-                ? 'No matching apps' 
+            _searchController.text.isNotEmpty
+                ? 'No matching apps'
                 : 'No apps installed',
             style: TextStyle(
               color: isDark
