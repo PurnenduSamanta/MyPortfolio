@@ -113,6 +113,17 @@ Avoid over-engineering. DO NOT implement:
         - Google Play Console: `https://play.google.com/store/apps/developer?id=Purnendu+Samanta`
     - Added Google Play dock icon/action.
 
+### Day 3 – March 27, 2026
+**Tasks completed:**
+- **Data Integration**: Wired `SheetService` with real Google Sheets CSV URL.
+- **At a Glance Widget**: Implemented a premium `ResumeWidget` between the Search Bar and App Grid, mimicking the Google Pixel experience.
+- **Exclusive Placement**: Filtered the "Resume" app out of the general `AppGrid` to keep it highlighted only in the new widget and notification panel.
+- **Brand Identity**: Upgraded the Dock Bar with official brand icons (GitHub, LinkedIn, Email, Google Play) using `font_awesome_flutter`.
+- **Dynamic Content**: Updated the Notification Panel to show a real-time auto-updating "Last Updated" date.
+- **UI Consistency**: Standardized all app icons with a uniform 16px corner radius, ensuring network images fill the container and are clipped accurately.
+- **Crash Fix**: Resolved "No Material widget found" error triggered during browser resizing by ensuring correct `Scaffold` wrapping at all breakpoints.
+- **Web Rendering**: Fixed `FaIcon` visibility on web by explicitly passing theme colors to the icon widgets.
+
 ---
 
 ## ⚠️ 5. Active Issues & Fixes Needed
@@ -124,7 +135,10 @@ The following items are known bugs or features not working smoothly. Read this b
    - *Status*: ✅ Resolved on March 26, 2026 (thresholded gestures + explicit desktop fallback controls + web drag-device support).
 2. **Google Sheet Link Missing**:
    - *Issue*: `lib/services/sheet_service.dart` is missing a valid Google Sheets published CSV link.
-   - *Fix Needed*: Add the real URL to fetch portfolio data dynamically.
+   - *Status*: ✅ Resolved on March 26, 2026 with real published CSV URL.
+4. **"No Material widget found" crash on narrow browser resize**:
+   - *Issue*: Resizing the browser below 600px switches from `_DesktopLayout` (which has a `Scaffold`) to a bare `HomeScreen` with no `Material` ancestor. Widgets like `TextField`, `InkWell`, `IconButton`, etc. all require a `Material` ancestor and crash.
+   - *Status*: ✅ Resolved on March 26, 2026 by wrapping the mobile `HomeScreen` path in a `Scaffold`.
 3. **External Dock Links**:
    - *Issue*: `dock_bar.dart` had empty / dummy link handlers.
    - *Status*: ✅ Resolved on March 26, 2026 with centralized real link constants and live URL launch actions.

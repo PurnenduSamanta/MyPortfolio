@@ -43,6 +43,15 @@ class _NotificationPanelState extends State<NotificationPanel> {
     _closeDragTriggered = false;
   }
 
+  static const _months = [
+    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+  ];
+
+  String _formatDate(DateTime date) {
+    return '${_months[date.month - 1]} ${date.year}';
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -289,7 +298,7 @@ class _NotificationPanelState extends State<NotificationPanel> {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    "Last updated: Jan 2026",
+                    "Last updated: ${_formatDate(DateTime.now())}",
                     style: TextStyle(
                       fontSize: 12,
                       color: isDark

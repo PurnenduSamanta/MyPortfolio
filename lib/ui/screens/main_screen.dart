@@ -18,7 +18,9 @@ class MainScreen extends StatelessWidget {
         if (isDesktop) {
           return _DesktopLayout(themeProvider: themeProvider);
         } else {
-          return HomeScreen(themeProvider: themeProvider);
+          return Scaffold(
+            body: HomeScreen(themeProvider: themeProvider),
+          );
         }
       },
     );

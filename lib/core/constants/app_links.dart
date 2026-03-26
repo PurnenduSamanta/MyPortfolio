@@ -4,4 +4,6 @@ class AppLinks {
   static const email = 'mailto:joysamanta84@gmail.com';
   static const googlePlayConsole =
       'https://play.google.com/store/apps/developer?id=Purnendu+Samanta';
+  static const resume =
+      'https://drive.google.com/file/d/1Au_SjOkasR6utXe91-yF8P8YyBpuAAA1/view?usp=drive_link';
 }

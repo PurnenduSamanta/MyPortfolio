@@ -114,24 +114,19 @@ class _AppIconState extends State<AppIcon> {
     }
 
     if (widget.appItem.iconUrl.isNotEmpty) {
-      const inset = 5.0;
-      final size = 56 - (inset * 2);
-      return Padding(
-        padding: const EdgeInsets.all(inset),
-        child: Image.network(
-          widget.appItem.iconUrl,
-          width: size,
-          height: size,
-          fit: BoxFit.contain,
-          filterQuality: FilterQuality.none,
-          errorBuilder: (context, error, stackTrace) {
-            return _buildDefaultIcon(isDark);
-          },
-          loadingBuilder: (context, child, loadingProgress) {
-            if (loadingProgress == null) return child;
-            return _buildLoadingIcon(isDark);
-          },
-        ),
+      return Image.network(
+        widget.appItem.iconUrl,
+        width: 56,
+        height: 56,
+        fit: BoxFit.cover,
+        filterQuality: FilterQuality.medium,
+        errorBuilder: (context, error, stackTrace) {
+          return _buildDefaultIcon(isDark);
+        },
+        loadingBuilder: (context, child, loadingProgress) {
+          if (loadingProgress == null) return child;
+          return _buildLoadingIcon(isDark);
+        },
       );
     }
     return _buildDefaultIcon(isDark);

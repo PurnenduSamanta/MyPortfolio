@@ -1,5 +1,6 @@
 import '../model/app_item.dart';
 import '../../services/sheet_service.dart';
+import '../../core/constants/app_links.dart';
 
 class AppRepository {
   final SheetService _sheetService = SheetService();
@@ -11,6 +12,17 @@ class AppRepository {
 
     try {
       _cachedItems = await _sheetService.fetchApps();
+      
+      // Ensure we always have a Resume item even if it's not in the sheet
+      if (!_cachedItems!.any((app) => app.isResume)) {
+        _cachedItems!.add(AppItem(
+          name: 'Resume',
+          iconUrl: '',
+          link: AppLinks.resume,
+          type: 'resume',
+        ));
+      }
+      
       return _cachedItems!;
     } catch (e) {
       // Return fallback data if Google Sheets fails
@@ -37,10 +49,10 @@ class AppRepository {
       type: 'project',
     )).toList();
 
-    items.add(const AppItem(
+    items.add(AppItem(
       name: 'Resume',
       iconUrl: '',
-      link: 'https://drive.google.com',
+      link: AppLinks.resume,
       type: 'resume',
     ));
 

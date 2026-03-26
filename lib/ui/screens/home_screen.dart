@@ -9,6 +9,7 @@ import '../widgets/app_grid.dart';
 import '../widgets/dock_bar.dart';
 import '../widgets/navigation_bar_widget.dart';
 import '../widgets/notification_panel.dart';
+import '../widgets/resume_widget.dart';
 
 class HomeScreen extends StatefulWidget {
   final ThemeProvider themeProvider;
@@ -27,6 +28,15 @@ class _HomeScreenState extends State<HomeScreen>
   List<AppItem> _allApps = [];
   List<AppItem> _filteredApps = [];
   bool _isLoading = true;
+
+  /// Resolve the resume link from loaded apps (or fallback)
+  String get _resumeLink {
+    final resume = _allApps.cast<AppItem?>().firstWhere(
+      (a) => a!.isResume,
+      orElse: () => null,
+    );
+    return resume?.link ?? 'https://google.com';
+  }
   String? _error;
 
   // Notification Panel Animation
@@ -67,7 +77,7 @@ class _HomeScreenState extends State<HomeScreen>
       final apps = await _repository.getApps();
       setState(() {
         _allApps = apps;
-        _filteredApps = apps;
+        _filteredApps = apps.where((a) => !a.isResume).toList();
         _isLoading = false;
       });
     } catch (e) {
@@ -80,10 +90,11 @@ class _HomeScreenState extends State<HomeScreen>
 
   void _onSearch(String query) {
     setState(() {
+      final nonResumeApps = _allApps.where((a) => !a.isResume);
       if (query.isEmpty) {
-        _filteredApps = _allApps;
+        _filteredApps = nonResumeApps.toList();
       } else {
-        _filteredApps = _allApps
+        _filteredApps = nonResumeApps
             .where(
               (app) => app.name.toLowerCase().contains(query.toLowerCase()),
             )
@@ -173,7 +184,13 @@ class _HomeScreenState extends State<HomeScreen>
                   onSearch: _onSearch,
                 ),
 
-                const SizedBox(height: 8),
+                const SizedBox(height: 6),
+
+                // At a Glance – Resume Widget
+                if (!_isLoading)
+                  ResumeWidget(resumeLink: _resumeLink),
+
+                const SizedBox(height: 4),
 
                 // Main Content
                 Expanded(
@@ -219,14 +236,7 @@ class _HomeScreenState extends State<HomeScreen>
             },
             child: NotificationPanel(
               onClose: _closeNotif,
-              resumeLink: _allApps.isNotEmpty
-                  ? _allApps
-                        .firstWhere(
-                          (a) => a.isResume,
-                          orElse: () => _allApps.first,
-                        )
-                        .link
-                  : "https://google.com",
+              resumeLink: _resumeLink,
             ),
           ),
         ],

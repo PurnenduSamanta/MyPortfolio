@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../core/constants/app_links.dart';
 import '../../core/theme/app_colors.dart';
@@ -44,27 +45,31 @@ class DockBar extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           _DockIcon(
-            icon: Icons.code_rounded,
+            iconData: FontAwesomeIcons.github,
+            iconSize: 20,
             label: 'GitHub',
             isDark: isDark,
             onTap: () => _openLink(AppLinks.github),
           ),
           _DockIcon(
-            icon: Icons.email_rounded,
-            label: 'Email',
-            isDark: isDark,
-            onTap: () => _openLink(AppLinks.email),
-          ),
-          _ThemeToggleIcon(themeProvider: themeProvider, isDark: isDark),
-          _DockIcon(
-            icon: Icons.link_rounded,
+            iconData: FontAwesomeIcons.linkedinIn,
+            iconSize: 18,
             label: 'LinkedIn',
             isDark: isDark,
             onTap: () => _openLink(AppLinks.linkedIn),
           ),
+          _ThemeToggleIcon(themeProvider: themeProvider, isDark: isDark),
           _DockIcon(
-            icon: Icons.play_circle_fill_rounded,
-            label: 'Play',
+            iconData: FontAwesomeIcons.envelope,
+            iconSize: 18,
+            label: 'Email',
+            isDark: isDark,
+            onTap: () => _openLink(AppLinks.email),
+          ),
+          _DockIcon(
+            iconData: FontAwesomeIcons.googlePlay,
+            iconSize: 18,
+            label: 'Play Store',
             isDark: isDark,
             onTap: () => _openLink(AppLinks.googlePlayConsole),
           ),
@@ -75,13 +80,15 @@ class DockBar extends StatelessWidget {
 }
 
 class _DockIcon extends StatefulWidget {
-  final IconData icon;
+  final IconData iconData;
+  final double iconSize;
   final String label;
   final bool isDark;
   final VoidCallback onTap;
 
   const _DockIcon({
-    required this.icon,
+    required this.iconData,
+    required this.iconSize,
     required this.label,
     required this.isDark,
     required this.onTap,
@@ -139,12 +146,14 @@ class _DockIconState extends State<_DockIcon>
               ),
               borderRadius: BorderRadius.circular(14),
             ),
-            child: Icon(
-              widget.icon,
-              color: widget.isDark
-                  ? AppColors.darkOnSurface
-                  : AppColors.lightOnSurface,
-              size: 22,
+            child: Center(
+              child: FaIcon(
+                widget.iconData,
+                size: widget.iconSize,
+                color: widget.isDark
+                    ? AppColors.darkOnSurface
+                    : AppColors.lightOnSurface,
+              ),
             ),
           ),
         ),
