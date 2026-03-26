@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../core/constants/app_links.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/theme_provider.dart';
 
@@ -46,20 +47,26 @@ class DockBar extends StatelessWidget {
             icon: Icons.code_rounded,
             label: 'GitHub',
             isDark: isDark,
-            onTap: () => _openLink('https://example.com/github'),
+            onTap: () => _openLink(AppLinks.github),
           ),
           _DockIcon(
             icon: Icons.email_rounded,
             label: 'Email',
             isDark: isDark,
-            onTap: () => _openLink('mailto:hello@example.com'),
+            onTap: () => _openLink(AppLinks.email),
           ),
           _ThemeToggleIcon(themeProvider: themeProvider, isDark: isDark),
           _DockIcon(
             icon: Icons.link_rounded,
             label: 'LinkedIn',
             isDark: isDark,
-            onTap: () => _openLink('https://example.com/linkedin'),
+            onTap: () => _openLink(AppLinks.linkedIn),
+          ),
+          _DockIcon(
+            icon: Icons.play_circle_fill_rounded,
+            label: 'Play',
+            isDark: isDark,
+            onTap: () => _openLink(AppLinks.googlePlayConsole),
           ),
         ],
       ),

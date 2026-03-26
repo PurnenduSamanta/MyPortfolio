@@ -206,6 +206,9 @@ class _HomeScreenState extends State<HomeScreen>
             animation: _notifController,
             builder: (context, child) {
               final isVisible = _notifController.value > 0;
+              if (!isVisible) {
+                return const SizedBox.shrink();
+              }
               return IgnorePointer(
                 ignoring: !isVisible,
                 child: Opacity(

@@ -96,6 +96,22 @@ Avoid over-engineering. DO NOT implement:
     - Wired dock GitHub/Email/LinkedIn icons to launch dummy links (theme toggle unchanged).
 - Dev tooling fix:
     - Replaced invalid VS Code Chrome URL launcher with proper Flutter debug configurations in `.vscode/launch.json` (`Flutter (Chrome)` + `Flutter (Web Server)`).
+- VS Code launch workflow updates:
+    - Added Flutter browser launch profiles for Chrome/Edge and reordered configs so Chrome can be launched quickly from Run/F5.
+    - Removed fixed web port binding from launch args to avoid local port-conflict startup failures.
+- App Grid + icon stability/performance updates:
+    - Added adaptive grid sizing to avoid bottom clipping in fullscreen layouts.
+    - Removed heavy per-item page-entry animations and optimized icon repaint behavior to reduce left-right swipe lag on web.
+    - Added overflow-safe icon tile scaling to fix `RenderFlex overflowed by 13 pixels on the bottom`.
+    - Hardened Resume detection (`type` + name check) and normalized Resume icon rendering to keep it visually consistent.
+- External links constants update:
+    - Added centralized constants file `lib/core/constants/app_links.dart`.
+    - Updated dock actions to use real links:
+        - GitHub: `https://github.com/PurnenduSamanta?tab=repositories`
+        - LinkedIn: `https://www.linkedin.com/in/purnendu9614/`
+        - Email: `mailto:joysamanta84@gmail.com`
+        - Google Play Console: `https://play.google.com/store/apps/developer?id=Purnendu+Samanta`
+    - Added Google Play dock icon/action.
 
 ---
 
@@ -110,8 +126,8 @@ The following items are known bugs or features not working smoothly. Read this b
    - *Issue*: `lib/services/sheet_service.dart` is missing a valid Google Sheets published CSV link.
    - *Fix Needed*: Add the real URL to fetch portfolio data dynamically.
 3. **External Dock Links**:
-   - *Issue*: `dock_bar.dart` has GitHub and Email icons, but their `onTap` events are empty `() {}`.
-   - *Status*: ✅ Resolved on March 26, 2026 with dummy launch URLs (replace with real links later).
+   - *Issue*: `dock_bar.dart` had empty / dummy link handlers.
+   - *Status*: ✅ Resolved on March 26, 2026 with centralized real link constants and live URL launch actions.
 
 ---
 

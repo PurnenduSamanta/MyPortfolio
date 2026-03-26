@@ -11,7 +11,11 @@ class AppItem {
     required this.type,
   });
 
-  bool get isResume => type.toLowerCase() == 'resume';
+  bool get isResume {
+    final normalizedType = type.trim().toLowerCase();
+    final normalizedName = name.trim().toLowerCase();
+    return normalizedType == 'resume' || normalizedName.contains('resume');
+  }
 
   factory AppItem.fromCsvRow(List<String> row) {
     return AppItem(

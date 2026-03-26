@@ -1,31 +1,38 @@
 {
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "name": "Flutter (Chrome)",
-            "request": "launch",
-            "type": "dart",
-            "program": "lib/main.dart",
-            "deviceId": "chrome",
-            "args": [
-                "--web-hostname",
-                "127.0.0.1",
-                "--web-port",
-                "5100"
-            ]
-        },
-        {
-            "name": "Flutter (Web Server)",
-            "request": "launch",
-            "type": "dart",
-            "program": "lib/main.dart",
-            "deviceId": "web-server",
-            "args": [
-                "--web-hostname",
-                "127.0.0.1",
-                "--web-port",
-                "5100"
-            ]
-        }
-    ]
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Flutter (Chrome)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "deviceId": "chrome",
+      "args": [
+        "--web-hostname",
+        "127.0.0.1"
+      ]
+    },
+    {
+      "name": "Flutter (Edge)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "deviceId": "edge",
+      "args": [
+        "--web-hostname",
+        "127.0.0.1"
+      ]
+    },
+    {
+      "name": "Flutter (Web Server)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "deviceId": "web-server",
+      "args": [
+        "--web-hostname",
+        "127.0.0.1"
+      ]
+    }
+  ]
 }

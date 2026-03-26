@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../data/model/app_item.dart';
 import '../../core/theme/app_colors.dart';
@@ -12,36 +13,10 @@ class AppIcon extends StatefulWidget {
   State<AppIcon> createState() => _AppIconState();
 }
 
-class _AppIconState extends State<AppIcon> with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _scaleAnimation;
+class _AppIconState extends State<AppIcon> {
   bool _isPressed = false;
 
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 150),
-      vsync: this,
-    );
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.88).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
   Future<void> _onTap() async {
-    // Play press animation
-    await _controller.forward();
-    await Future.delayed(const Duration(milliseconds: 80));
-    await _controller.reverse();
-
-    // Open link
     final url = Uri.parse(widget.appItem.link);
     if (await canLaunchUrl(url)) {
       await launchUrl(url, mode: LaunchMode.externalApplication);
@@ -51,13 +26,13 @@ class _AppIconState extends State<AppIcon> with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final labelColor =
-        isDark ? AppColors.darkIconLabel : AppColors.lightIconLabel;
+    final labelColor = isDark
+        ? AppColors.darkIconLabel
+        : AppColors.lightIconLabel;
 
     return GestureDetector(
       onTapDown: (_) {
         setState(() => _isPressed = true);
-        _controller.forward();
       },
       onTapUp: (_) {
         setState(() => _isPressed = false);
@@ -65,79 +40,98 @@ class _AppIconState extends State<AppIcon> with SingleTickerProviderStateMixin {
       },
       onTapCancel: () {
         setState(() => _isPressed = false);
-        _controller.reverse();
       },
-      child: AnimatedBuilder(
-        animation: _scaleAnimation,
-        builder: (context, child) {
-          return Transform.scale(
-            scale: _scaleAnimation.value,
-            child: child,
-          );
-        },
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Icon container
-            Container(
-              width: 56,
-              height: 56,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: (isDark
-                            ? Colors.black
-                            : Colors.grey.shade400)
-                        .withValues(alpha: _isPressed ? 0.0 : 0.15),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: _buildIcon(isDark),
-              ),
-            ),
-            const SizedBox(height: 8),
-            // Label
-            SizedBox(
-              width: 72,
-              child: Text(
-                widget.appItem.name,
-                textAlign: TextAlign.center,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: labelColor,
-                  fontSize: 11.5,
-                  fontWeight: FontWeight.w500,
-                  letterSpacing: 0.1,
-                  height: 1.2,
+      child: AnimatedScale(
+        duration: const Duration(milliseconds: 110),
+        curve: Curves.easeOutCubic,
+        scale: _isPressed ? 0.92 : 1.0,
+        child: Center(
+          child: ClipRect(
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: SizedBox(
+                width: 72,
+                height: 84,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 56,
+                      height: 56,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: kIsWeb
+                            ? const []
+                            : [
+                                BoxShadow(
+                                  color:
+                                      (isDark
+                                              ? Colors.black
+                                              : Colors.grey.shade400)
+                                          .withValues(
+                                            alpha: _isPressed ? 0.0 : 0.15,
+                                          ),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(16),
+                        child: _buildIcon(isDark),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    SizedBox(
+                      width: 72,
+                      child: Text(
+                        widget.appItem.name,
+                        textAlign: TextAlign.center,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: labelColor,
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.w500,
+                          letterSpacing: 0.1,
+                          height: 1.2,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
-          ],
+          ),
         ),
       ),
     );
   }
 
   Widget _buildIcon(bool isDark) {
+    if (widget.appItem.isResume) {
+      return _buildResumeIcon();
+    }
+
     if (widget.appItem.iconUrl.isNotEmpty) {
-      return Image.network(
-        widget.appItem.iconUrl,
-        width: 56,
-        height: 56,
-        fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) {
-          return _buildDefaultIcon(isDark);
-        },
-        loadingBuilder: (context, child, loadingProgress) {
-          if (loadingProgress == null) return child;
-          return _buildLoadingIcon(isDark);
-        },
+      const inset = 5.0;
+      final size = 56 - (inset * 2);
+      return Padding(
+        padding: const EdgeInsets.all(inset),
+        child: Image.network(
+          widget.appItem.iconUrl,
+          width: size,
+          height: size,
+          fit: BoxFit.contain,
+          filterQuality: FilterQuality.none,
+          errorBuilder: (context, error, stackTrace) {
+            return _buildDefaultIcon(isDark);
+          },
+          loadingBuilder: (context, child, loadingProgress) {
+            if (loadingProgress == null) return child;
+            return _buildLoadingIcon(isDark);
+          },
+        ),
       );
     }
     return _buildDefaultIcon(isDark);
@@ -149,25 +143,22 @@ class _AppIconState extends State<AppIcon> with SingleTickerProviderStateMixin {
     final colors = _getGradientColors(hash);
 
     IconData icon;
-    if (widget.appItem.isResume) {
-      icon = Icons.person_rounded;
-    } else {
-      final icons = [
-        Icons.code_rounded,
-        Icons.smartphone_rounded,
-        Icons.cloud_rounded,
-        Icons.palette_rounded,
-        Icons.music_note_rounded,
-        Icons.shopping_bag_rounded,
-        Icons.chat_bubble_rounded,
-        Icons.fitness_center_rounded,
-        Icons.note_alt_rounded,
-        Icons.camera_alt_rounded,
-        Icons.rocket_launch_rounded,
-        Icons.games_rounded,
-      ];
-      icon = icons[hash.abs() % icons.length];
-    }
+    const iconSize = 28.0;
+    final icons = [
+      Icons.code_rounded,
+      Icons.smartphone_rounded,
+      Icons.cloud_rounded,
+      Icons.palette_rounded,
+      Icons.music_note_rounded,
+      Icons.shopping_bag_rounded,
+      Icons.chat_bubble_rounded,
+      Icons.fitness_center_rounded,
+      Icons.note_alt_rounded,
+      Icons.camera_alt_rounded,
+      Icons.rocket_launch_rounded,
+      Icons.games_rounded,
+    ];
+    icon = icons[hash.abs() % icons.length];
 
     return Container(
       width: 56,
@@ -179,10 +170,24 @@ class _AppIconState extends State<AppIcon> with SingleTickerProviderStateMixin {
           end: Alignment.bottomRight,
         ),
       ),
-      child: Icon(
-        icon,
-        color: Colors.white,
-        size: 28,
+      child: Icon(icon, color: Colors.white, size: iconSize),
+    );
+  }
+
+  Widget _buildResumeIcon() {
+    return Container(
+      width: 56,
+      height: 56,
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Color(0xFF2563EB), Color(0xFF1D4ED8)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
+      child: const Padding(
+        padding: EdgeInsets.all(6),
+        child: Icon(Icons.description_rounded, color: Colors.white, size: 18),
       ),
     );
   }

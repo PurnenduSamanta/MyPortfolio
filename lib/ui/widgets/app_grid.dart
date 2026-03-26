@@ -1,5 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+
 import '../../data/model/app_item.dart';
 import 'app_icon.dart';
 
@@ -67,27 +68,50 @@ class _AppGridState extends State<AppGrid> {
                     widget.apps.length,
                   );
                   final pageApps = widget.apps.sublist(startIndex, endIndex);
+                  const horizontalPadding = 20.0;
+                  const verticalPadding = 16.0;
+                  const crossAxisCount = 4;
+                  const mainAxisSpacing = 16.0;
+                  const crossAxisSpacing = 8.0;
 
-                  return GridView.builder(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 16,
-                    ),
-                    physics:
-                        const NeverScrollableScrollPhysics(), // Scroll handled by PageView
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 4,
-                          mainAxisSpacing: 20,
-                          crossAxisSpacing: 8,
-                          childAspectRatio: 0.78,
+                  return LayoutBuilder(
+                    builder: (context, constraints) {
+                      final rowCount = (pageApps.length / crossAxisCount)
+                          .ceil()
+                          .clamp(1, 5);
+                      final tileWidth =
+                          (constraints.maxWidth -
+                              (horizontalPadding * 2) -
+                              ((crossAxisCount - 1) * crossAxisSpacing)) /
+                          crossAxisCount;
+                      final usableHeight =
+                          constraints.maxHeight -
+                          (verticalPadding * 2) -
+                          ((rowCount - 1) * mainAxisSpacing);
+                      final tileHeight = usableHeight / rowCount;
+                      final adaptiveAspectRatio = (tileWidth / tileHeight)
+                          .clamp(0.82, 1.2);
+
+                      return GridView.builder(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: horizontalPadding,
+                          vertical: verticalPadding,
                         ),
-                    itemCount: pageApps.length,
-                    itemBuilder: (context, index) {
-                      return _AnimatedAppIcon(
-                        key: ValueKey(pageApps[index].name),
-                        index: index,
-                        child: AppIcon(appItem: pageApps[index]),
+                        physics:
+                            const NeverScrollableScrollPhysics(), // Scroll handled by PageView
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: crossAxisCount,
+                          mainAxisSpacing: mainAxisSpacing,
+                          crossAxisSpacing: crossAxisSpacing,
+                          childAspectRatio: adaptiveAspectRatio,
+                        ),
+                        itemCount: pageApps.length,
+                        itemBuilder: (context, index) {
+                          return RepaintBoundary(
+                            key: ValueKey(pageApps[index].name),
+                            child: AppIcon(appItem: pageApps[index]),
+                          );
+                        },
                       );
                     },
                   );
@@ -168,64 +192,6 @@ class _AppGridState extends State<AppGrid> {
             ),
           ),
       ],
-    );
-  }
-}
-
-class _AnimatedAppIcon extends StatefulWidget {
-  final int index;
-  final Widget child;
-
-  const _AnimatedAppIcon({super.key, required this.index, required this.child});
-
-  @override
-  State<_AnimatedAppIcon> createState() => _AnimatedAppIconState();
-}
-
-class _AnimatedAppIconState extends State<_AnimatedAppIcon>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _fadeAnimation;
-  late Animation<Offset> _slideAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 400),
-      vsync: this,
-    );
-
-    final delay = widget.index * 0.05; // Slightly faster entrance
-    final curve = Interval(
-      delay.clamp(0.0, 0.7),
-      (delay + 0.3).clamp(0.3, 1.0),
-      curve: Curves.easeOutCubic,
-    );
-
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(parent: _controller, curve: curve));
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.1),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(parent: _controller, curve: curve));
-
-    _controller.forward();
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return FadeTransition(
-      opacity: _fadeAnimation,
-      child: SlideTransition(position: _slideAnimation, child: widget.child),
     );
   }
 }
