@@ -32,11 +32,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2. Install Flutter (stable channel)
+      # 2. Install Flutter (pinned to match local dev environment exactly)
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: 'stable'
+          flutter-version: '3.41.5'
           channel: 'stable'
           cache: true
 
