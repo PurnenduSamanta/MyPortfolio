@@ -17,6 +17,7 @@ class _BootSequenceScreenState extends State<BootSequenceScreen>
     with SingleTickerProviderStateMixin {
   late final BootSequenceViewModel _viewModel;
   late final AnimationController _bootController;
+  bool _precaching = false;
 
   @override
   void initState() {
@@ -31,6 +32,20 @@ class _BootSequenceScreenState extends State<BootSequenceScreen>
 
   void _onViewModelChanged() {
     if (!mounted) return;
+
+    // When the ViewModel has fetched the profileImageUrl, precache it
+    final url = _viewModel.profileImageUrl;
+    if (url != null && !_precaching) {
+      _precaching = true;
+      precacheImage(NetworkImage(url), context).then((_) {
+        debugPrint('[Boot] precacheImage success');
+        _viewModel.onImagePrecached();
+      }).catchError((e) {
+        debugPrint('[Boot] precacheImage failed: $e');
+        _viewModel.onImagePrecached(); // proceed anyway
+      });
+    }
+
     setState(() {});
   }
 
@@ -51,7 +66,9 @@ class _BootSequenceScreenState extends State<BootSequenceScreen>
           : BootView(
               key: const ValueKey('boot-view'),
               progress: _bootController,
+              imageUrl: _viewModel.profileImageUrl,
             ),
     );
   }
 }
+

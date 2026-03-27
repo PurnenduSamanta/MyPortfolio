@@ -21,6 +21,7 @@ class AppRepository {
             iconUrl: '',
             link: AppLinks.resume,
             type: 'resume',
+            profileImage: '',
           ),
         );
       }
@@ -77,6 +78,7 @@ class AppRepository {
         iconUrl: '',
         link: AppLinks.resume,
         type: 'resume',
+        profileImage: '',
       ),
     );
 

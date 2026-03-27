@@ -3,12 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:my_portfolio/core/constants/app_links.dart';
 import 'package:my_portfolio/data/model/app_item.dart';
 import 'package:my_portfolio/data/repository/app_repository.dart';
+import 'package:my_portfolio/services/quote_service.dart';
 
 class HomeViewModel extends ChangeNotifier {
   final AppRepository _repository;
+  final QuoteService _quoteService;
 
-  HomeViewModel({AppRepository? repository})
-    : _repository = repository ?? AppRepository();
+  HomeViewModel({AppRepository? repository, QuoteService? quoteService})
+    : _repository = repository ?? AppRepository(),
+      _quoteService = quoteService ?? QuoteService();
 
   List<AppItem> _allApps = [];
   List<AppItem> _filteredApps = [];
@@ -20,12 +23,18 @@ class HomeViewModel extends ChangeNotifier {
   double _statusBarDragDistance = 0;
   bool _statusBarDragTriggered = false;
 
+  // Quote state
+  Quote? _quote;
+  bool _quoteLoading = false;
+
   List<AppItem> get filteredApps => _filteredApps;
   AppItem? get activeProject => _activeProject;
   bool get isLoading => _isLoading;
   String? get error => _error;
   bool get isNotifOpen => _isNotifOpen;
   bool get isDetailOpen => _activeProject != null;
+  Quote? get quote => _quote;
+  bool get quoteLoading => _quoteLoading;
 
   String get resumeLink {
     final resume = _allApps.cast<AppItem?>().firstWhere(
@@ -33,6 +42,14 @@ class HomeViewModel extends ChangeNotifier {
       orElse: () => null,
     );
     return resume?.link ?? AppLinks.resume;
+  }
+
+  String? get profileImageUrl {
+    final item = _allApps.cast<AppItem?>().firstWhere(
+      (a) => a != null && a.profileImage.isNotEmpty,
+      orElse: () => null,
+    );
+    return item?.profileImage;
   }
 
   Future<void> loadApps() async {
@@ -81,8 +98,28 @@ class HomeViewModel extends ChangeNotifier {
   bool openNotif() {
     if (_isNotifOpen || isDetailOpen) return false;
     _isNotifOpen = true;
+    _prepareQuote();
     notifyListeners();
     return true;
+  }
+
+  void _prepareQuote() {
+    _quote = QuoteService.randomLocalQuote();
+    _quoteLoading = false;
+
+    _tryApiQuote();
+  }
+
+  Future<void> _tryApiQuote() async {
+    try {
+      final apiQuote = await _quoteService
+          .fetchRandomQuote()
+          .timeout(const Duration(seconds: 5));
+      _quote = apiQuote;
+      notifyListeners();
+    } catch (_) {
+      // Local quote is already set, nothing to do
+    }
   }
 
   bool closeNotif() {
@@ -106,6 +143,7 @@ class HomeViewModel extends ChangeNotifier {
     if (_statusBarDragDistance >= 24) {
       _statusBarDragTriggered = true;
       _isNotifOpen = true;
+      _prepareQuote();
       notifyListeners();
       return true;
     }

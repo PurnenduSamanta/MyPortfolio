@@ -43,6 +43,7 @@ class ProjectDetailScreen extends StatelessWidget {
               isDark: isDark,
               onBack: onBack,
               onOpenProject: () => viewModel.openProject(),
+              stateBadge: detail.state.contains('Live') ? 'Live' : 'Preview',
             ),
             Expanded(
               child: SingleChildScrollView(

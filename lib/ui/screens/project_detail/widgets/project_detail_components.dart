@@ -10,6 +10,7 @@ class ProjectDetailTopBar extends StatelessWidget {
   final bool isDark;
   final VoidCallback onBack;
   final VoidCallback onOpenProject;
+  final String stateBadge;
 
   const ProjectDetailTopBar({
     super.key,
@@ -17,6 +18,7 @@ class ProjectDetailTopBar extends StatelessWidget {
     required this.isDark,
     required this.onBack,
     required this.onOpenProject,
+    this.stateBadge = 'Preview',
   });
 
   @override
@@ -71,7 +73,7 @@ class ProjectDetailTopBar extends StatelessWidget {
               ),
             ),
             child: Text(
-              'Preview',
+              stateBadge,
               style: TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w600,

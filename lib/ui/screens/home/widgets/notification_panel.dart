@@ -7,11 +7,17 @@ import 'package:my_portfolio/core/constants/app_spacing.dart';
 class NotificationPanel extends StatefulWidget {
   final VoidCallback onClose;
   final String resumeLink;
+  final String? quoteText;
+  final String? quoteAuthor;
+  final bool quoteLoading;
 
   const NotificationPanel({
     super.key,
     required this.onClose,
     required this.resumeLink,
+    this.quoteText,
+    this.quoteAuthor,
+    this.quoteLoading = true,
   });
 
   @override
@@ -129,12 +135,12 @@ class _NotificationPanelState extends State<NotificationPanel> {
                   ),
                   const SizedBox(height: AppSpacing.screenHorizontal),
 
-                  // Quick Highlights (Dynamic Signals)
+                  // Quick Highlights
                   _buildQuickHighlights(isDark),
 
                   const SizedBox(height: AppSpacing.screenHorizontal),
 
-                  // Micro-storytelling
+                  // Daily Pulse - Quote
                   _buildMicroStory(isDark),
 
                   const SizedBox(height: AppSpacing.screenHorizontal),
@@ -144,7 +150,7 @@ class _NotificationPanelState extends State<NotificationPanel> {
 
                   const SizedBox(height: AppSpacing.screenHorizontal),
 
-                  // Close Button (Subtle)
+                  // Close Button
                   Center(
                     child: IconButton(
                       onPressed: widget.onClose,
@@ -221,7 +227,7 @@ class _NotificationPanelState extends State<NotificationPanel> {
           Row(
             children: [
               Icon(
-                Icons.info_outline_rounded,
+                Icons.format_quote_rounded,
                 size: 16,
                 color: isDark ? AppColors.darkPrimary : AppColors.lightPrimary,
               ),
@@ -239,18 +245,77 @@ class _NotificationPanelState extends State<NotificationPanel> {
             ],
           ),
           const SizedBox(height: AppSpacing.md),
-          Text(
-            "Building the future of web experiences one pixel at a time. Currently exploring the intersection of AI and Creative Coding.",
-            style: TextStyle(
-              fontSize: 13,
-              color: isDark
-                  ? AppColors.darkOnSurfaceVariant
-                  : AppColors.lightOnSurfaceVariant,
-              height: 1.4,
-            ),
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 400),
+            child: widget.quoteLoading
+                ? _buildQuoteShimmer(isDark)
+                : Column(
+                    key: ValueKey(widget.quoteText),
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "\"${widget.quoteText ?? ''}\"",
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontStyle: FontStyle.italic,
+                          color: isDark
+                              ? AppColors.darkOnSurfaceVariant
+                              : AppColors.lightOnSurfaceVariant,
+                          height: 1.45,
+                        ),
+                      ),
+                      if (widget.quoteAuthor != null) ...[
+                        const SizedBox(height: AppSpacing.sm),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: Text(
+                            "— ${widget.quoteAuthor}",
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              color: isDark
+                                  ? AppColors.darkPrimary.withValues(alpha: 0.8)
+                                  : AppColors.lightPrimary.withValues(
+                                      alpha: 0.8,
+                                    ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildQuoteShimmer(bool isDark) {
+    final shimmerColor = isDark
+        ? Colors.white.withValues(alpha: 0.08)
+        : Colors.black.withValues(alpha: 0.06);
+    return Column(
+      key: const ValueKey('shimmer'),
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          height: 12,
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: shimmerColor,
+            borderRadius: BorderRadius.circular(6),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          height: 12,
+          width: 200,
+          decoration: BoxDecoration(
+            color: shimmerColor,
+            borderRadius: BorderRadius.circular(6),
+          ),
+        ),
+      ],
     );
   }
 

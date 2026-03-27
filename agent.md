@@ -39,7 +39,8 @@ lib/
 │   ├── model/                          # AppItem (Portfolio item model)
 │   └── repository/                     # Caching & fallback data
 ├── services/
-│   └── sheet_service.dart              # Google Sheets CSV fetcher (uses AppLinks.googleSheetCsvUrl)
+│   ├── sheet_service.dart              # Google Sheets CSV fetcher (uses AppLinks.googleSheetCsvUrl)
+│   └── quote_service.dart              # Random quote fetcher (DummyJSON API + local fallback)
 └── ui/
     └── screens/
         ├── boot_sequence/
@@ -162,6 +163,37 @@ Avoid over-engineering. DO NOT implement:
     - Removed hardcoded `Duration`, `Color(0x...)`, `EdgeInsets(...)`, and external URL literals from screen/widget files; they now resolve from constants.
     - `SheetService` now reads the CSV URL from `AppLinks.googleSheetCsvUrl`.
 - **View Simplification**: Refactored `HomeScreen`, `BootSequenceScreen`, and `ProjectDetailScreen` to focus on rendering and delegate logic/actions to their respective ViewModels.
+
+### Day 4 – March 28, 2026
+**Tasks completed:**
+- **Boot Screen Profile Image**: Integrated dynamic profile image fetching from Google Sheet into the boot sequence.
+    - Updated `AppItem` model to parse a `ProfileImage` column from the CSV.
+    - Implemented a `_processImageUrl` utility to convert Google Drive share links into direct-serve `lh3.googleusercontent.com` URLs (CORS-compatible for Flutter Web).
+    - `BootSequenceViewModel` holds the transition until both the boot animation and image precaching complete (with a 10s safety timeout).
+    - Profile image fades in smoothly using `frameBuilder` + `AnimatedOpacity` (800ms ease-in).
+- **Music Player Resume Widget**: Redesigned the `ResumeWidget` on the home screen as an Android-style media player widget.
+    - Profile image as album art with gradient fallback.
+    - Animated "Now Playing" equalizer bars (3-bar pulse animation).
+    - Toggleable Play/Pause that controls progress bar and equalizer animations.
+    - Decorative Skip Previous/Next buttons.
+    - Animated progress bar with time labels (loops over 40s).
+    - Tap anywhere on the widget to open the resume link.
+- **Daily Pulse – Random Quotes**: Added live random quotes to the Notification Panel's "Daily Pulse" section.
+    - Created `QuoteService` (`lib/services/quote_service.dart`) with DummyJSON API integration (`dummyjson.com/quotes/random`) — CORS compatible.
+    - Includes 15 curated local fallback quotes for instant display when the API fails.
+    - Quote data flows through the MVVM architecture: `QuoteService` → `HomeViewModel` → `NotificationPanel`.
+    - Quote is loaded synchronously (local) on panel open, then silently upgraded with an API quote in the background.
+- **Notification Panel MVVM Fix**: Fixed a critical bug where the notification panel always showed empty quote text.
+    - Root cause: The drag-to-open path (`onStatusBarDragUpdate`) bypassed `openNotif()` entirely, never setting `_quote`.
+    - Extracted shared `_prepareQuote()` method called by both tap and drag open paths.
+    - Moved `NotificationPanel` from `AnimatedBuilder`'s `child` parameter (rebuild-proof cache) into the `builder` callback to ensure fresh ViewModel data on every rebuild.
+- **Real ProjectDetailScreen Data**: Wired `ProjectDetailScreen` to display real project data from Google Sheet.
+    - Added 3 new fields to `AppItem`: `overview` (String), `techStacks` (List<String>), `highlights` (List<String>).
+    - TechStacks and Highlights use pipe-separated (`|`) values in a single cell, parsed into lists via `split('|')`.
+    - Updated CSV column order: `Name, IconUrl, Link, Type, Overview, TechStacks, Highlights, ProfileImage`.
+    - `ProjectDetailViewModel` uses real data when available, falls back to dummy data when fields are empty.
+    - Top bar badge dynamically shows "Live" vs "Preview" based on data availability.
+- **Cleanup**: Removed profile avatar from status bar (now lives in music player widget). Removed all temporary debug prints.
 
 ---
 

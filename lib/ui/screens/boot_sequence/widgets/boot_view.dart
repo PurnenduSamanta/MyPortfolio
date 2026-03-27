@@ -7,10 +7,11 @@ import 'package:my_portfolio/core/constants/app_gradients.dart';
 import 'package:my_portfolio/core/constants/app_spacing.dart';
 
 class BootView extends StatelessWidget {
-  static const String _profileImagePath = 'profile/purnendu.jpg';
+  static const String _defaultProfileImagePath = 'profile/purnendu.jpg';
   final Animation<double> progress;
+  final String? imageUrl;
 
-  const BootView({super.key, required this.progress});
+  const BootView({super.key, required this.progress, this.imageUrl});
 
   @override
   Widget build(BuildContext context) {
@@ -72,7 +73,10 @@ class BootView extends StatelessWidget {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        _BootAvatar(progress: p, imagePath: _profileImagePath),
+                        _BootAvatar(
+                          progress: p,
+                          imagePath: imageUrl ?? _defaultProfileImagePath,
+                        ),
                         const SizedBox(height: AppSpacing.xxl),
                         Text(
                           'Hi👏, I am Purnendu Samanta',
@@ -236,6 +240,7 @@ class _BootStreaksPainter extends CustomPainter {
 }
 
 class _BootAvatar extends StatelessWidget {
+  static const Duration _fadeInDuration = Duration(milliseconds: 800);
   final double progress;
   final String imagePath;
 
@@ -313,8 +318,8 @@ class _BootAvatar extends StatelessWidget {
             ),
           ),
           Container(
-            width: 144,
-            height: 144,
+            width: 140,
+            height: 140,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: isDark ? AppColors.bootAvatarBackgroundDark : Colors.white,
@@ -327,6 +332,15 @@ class _BootAvatar extends StatelessWidget {
               child: Image.network(
                 imagePath,
                 fit: BoxFit.cover,
+                frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+                  if (wasSynchronouslyLoaded) return child;
+                  return AnimatedOpacity(
+                    opacity: frame != null ? 1.0 : 0.0,
+                    duration: _fadeInDuration,
+                    curve: Curves.easeIn,
+                    child: child,
+                  );
+                },
                 errorBuilder: (context, _, _) => Container(
                   color: isDark
                       ? AppColors.bootAvatarFallbackDark

@@ -5,7 +5,10 @@ import 'package:my_portfolio/core/constants/app_spacing.dart';
 class StatusBarWidget extends StatelessWidget {
   final VoidCallback? onNotificationTap;
 
-  const StatusBarWidget({super.key, this.onNotificationTap});
+  const StatusBarWidget({
+    super.key,
+    this.onNotificationTap,
+  });
 
   @override
   Widget build(BuildContext context) {

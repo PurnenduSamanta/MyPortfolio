@@ -24,7 +24,7 @@ class ProjectDetailViewModel extends ChangeNotifier {
 
   ProjectDetailViewModel({required this.appItem});
 
-  ProjectDetailData get detail => _buildDummyDetail(appItem.name);
+  ProjectDetailData get detail => _buildDetail();
 
   Future<void> openProject() async {
     final uri = Uri.parse(appItem.link);
@@ -33,7 +33,32 @@ class ProjectDetailViewModel extends ChangeNotifier {
     }
   }
 
-  ProjectDetailData _buildDummyDetail(String projectName) {
+  ProjectDetailData _buildDetail() {
+    final hasRealData = appItem.overview.isNotEmpty ||
+        appItem.techStacks.isNotEmpty ||
+        appItem.highlights.isNotEmpty;
+
+    if (hasRealData) {
+      return ProjectDetailData(
+        summary: '${appItem.name} — Project Details',
+        description: appItem.overview.isNotEmpty
+            ? appItem.overview
+            : 'Details for ${appItem.name} will be available soon.',
+        techStack: appItem.techStacks.isNotEmpty
+            ? appItem.techStacks
+            : ['Not specified'],
+        highlights: appItem.highlights.isNotEmpty
+            ? appItem.highlights
+            : ['More details coming soon.'],
+        state: 'Live Project',
+      );
+    }
+
+    // Fallback for projects without sheet data
+    return _buildFallbackDetail(appItem.name);
+  }
+
+  ProjectDetailData _buildFallbackDetail(String projectName) {
     final stacks = [
       ['Flutter', 'Dart', 'Firebase', 'REST API'],
       ['Kotlin', 'Jetpack', 'Room DB', 'Material 3'],
@@ -44,16 +69,16 @@ class ProjectDetailViewModel extends ChangeNotifier {
     final stack = stacks[hash % stacks.length];
 
     return ProjectDetailData(
-      summary: '$projectName - Product Preview',
+      summary: '$projectName — Product Preview',
       description:
-          'This is a placeholder detail page for $projectName. Later this section will be driven by Google Sheets data so each project can show real context before redirecting.',
+          'This is a placeholder detail page for $projectName. Add Overview, TechStacks, and Highlights columns in the Google Sheet to show real content.',
       techStack: stack,
       highlights: const [
-        'Focused on clean UI, stable performance, and responsive layout behavior.',
-        'Implements modular architecture so features can scale safely over time.',
-        'Ready for data-driven project metadata from external sheet configuration.',
+        'Focused on clean UI, stable performance, and responsive layout.',
+        'Implements modular architecture for safe feature scaling.',
+        'Data-driven project metadata will appear once sheet columns are filled.',
       ],
-      state: 'Preview Mode · Dummy Content',
+      state: 'Preview Mode · Add data in Google Sheet',
     );
   }
 }

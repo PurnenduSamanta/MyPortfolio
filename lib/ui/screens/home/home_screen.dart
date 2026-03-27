@@ -123,7 +123,9 @@ class _HomeScreenState extends State<HomeScreen>
                     onVerticalDragUpdate: _onStatusBarDragUpdate,
                     onVerticalDragEnd: _onStatusBarDragEnd,
                     onTap: _openNotif,
-                    child: StatusBarWidget(onNotificationTap: _openNotif),
+                    child: StatusBarWidget(
+                      onNotificationTap: _openNotif,
+                    ),
                   ),
                   const SizedBox(height: AppSpacing.md),
                   SearchBarWidget(
@@ -132,7 +134,10 @@ class _HomeScreenState extends State<HomeScreen>
                   ),
                   const SizedBox(height: AppSpacing.sm),
                   if (!_viewModel.isLoading)
-                    ResumeWidget(resumeLink: _viewModel.resumeLink),
+                    ResumeWidget(
+                      resumeLink: _viewModel.resumeLink,
+                      profileImageUrl: _viewModel.profileImageUrl,
+                    ),
                   const SizedBox(height: AppSpacing.xs),
                   Expanded(
                     child: _viewModel.isLoading
@@ -165,7 +170,7 @@ class _HomeScreenState extends State<HomeScreen>
           if (!_viewModel.isDetailOpen)
             AnimatedBuilder(
               animation: _notifController,
-              builder: (context, child) {
+              builder: (context, _) {
                 final isVisible = _notifController.value > 0;
                 if (!isVisible) {
                   return const SizedBox.shrink();
@@ -174,14 +179,19 @@ class _HomeScreenState extends State<HomeScreen>
                   ignoring: !isVisible,
                   child: Opacity(
                     opacity: _notifController.value,
-                    child: SlideTransition(position: _notifSlide, child: child),
+                    child: SlideTransition(
+                      position: _notifSlide,
+                      child: NotificationPanel(
+                        onClose: _closeNotif,
+                        resumeLink: _viewModel.resumeLink,
+                        quoteText: _viewModel.quote?.text,
+                        quoteAuthor: _viewModel.quote?.author,
+                        quoteLoading: _viewModel.quoteLoading,
+                      ),
+                    ),
                   ),
                 );
               },
-              child: NotificationPanel(
-                onClose: _closeNotif,
-                resumeLink: _viewModel.resumeLink,
-              ),
             ),
         ],
       ),
