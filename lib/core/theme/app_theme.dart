@@ -13,9 +13,7 @@ class AppTheme {
         onSurface: AppColors.lightOnSurface,
         primary: AppColors.lightPrimary,
       ),
-      textTheme: GoogleFonts.interTextTheme(
-        ThemeData.light().textTheme,
-      ),
+      textTheme: GoogleFonts.interTextTheme(ThemeData.light().textTheme),
     );
   }
 
@@ -29,9 +27,7 @@ class AppTheme {
         onSurface: AppColors.darkOnSurface,
         primary: AppColors.darkPrimary,
       ),
-      textTheme: GoogleFonts.interTextTheme(
-        ThemeData.dark().textTheme,
-      ),
+      textTheme: GoogleFonts.interTextTheme(ThemeData.dark().textTheme),
     );
   }
 }

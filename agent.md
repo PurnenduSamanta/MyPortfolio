@@ -31,25 +31,46 @@ It is NOT a traditional portfolio website. The core goal is that the user feels 
 ### Folder Structure Overview
 ```
 lib/
-├── main.dart                          # App entry point
+├── main.dart                           # App entry point
 ├── core/
-│   └── theme/                         # Light/Dark colors & ThemeProvider
+│   ├── constants/                      # Centralized links, data sources, colors, gradients, spacing, durations
+│   └── theme/                          # Theme setup + ThemeProvider
 ├── data/
-│   ├── model/                         # AppItem (Portfolio item model)
-│   └── repository/                    # Caching & fallback data
+│   ├── model/                          # AppItem (Portfolio item model)
+│   └── repository/                     # Caching & fallback data
 ├── services/
-│   └── sheet_service.dart             # Google Sheets CSV fetcher
+│   └── sheet_service.dart              # Google Sheets CSV fetcher (uses AppLinks.googleSheetCsvUrl)
 └── ui/
-    ├── screens/
-    │   ├── home_screen.dart           # Android home screen layout (status, search, grid, dock, notification stack)
-    │   └── main_screen.dart           # Desktop frame + background orbs + responsive logic
-    └── widgets/
-        ├── app_grid.dart              # Horizontal page swiping + staggered icons
-        ├── app_icon.dart              # Tap scale animation + dynamic gradients
-        ├── dock_bar.dart              # Bottom dock (Theme toggle + Links)
-        ├── notification_panel.dart    # Android 12+ pull-down panel with blur
-        ├── search_bar_widget.dart     # Interactive name-based search field
-        └── status_bar.dart            # Fake status bar with real time
+    └── screens/
+        ├── boot_sequence/
+        │   ├── boot_sequence_screen.dart
+        │   ├── boot_sequence_view_model.dart
+        │   └── widgets/
+        │       └── boot_view.dart
+        ├── home/
+        │   ├── home_screen.dart
+        │   ├── home_view_model.dart
+        │   └── widgets/
+        │       ├── app_grid.dart
+        │       ├── app_icon.dart
+        │       ├── dock_bar.dart
+        │       ├── navigation_bar_widget.dart
+        │       ├── notification_panel.dart
+        │       ├── resume_widget.dart
+        │       ├── search_bar_widget.dart
+        │       └── status_bar.dart
+        ├── main/
+        │   ├── main_screen.dart
+        │   ├── main_view_model.dart
+        │   └── widgets/
+        │       └── main_desktop_layout.dart
+        └── project_detail/
+            ├── project_detail_screen.dart
+            ├── project_detail_view_model.dart
+            └── widgets/
+                ├── project_detail_components.dart
+                ├── project_navigation_bar_widget.dart
+                └── project_status_bar_widget.dart
 ```
 
 ---
@@ -123,6 +144,24 @@ Avoid over-engineering. DO NOT implement:
 - **UI Consistency**: Standardized all app icons with a uniform 16px corner radius, ensuring network images fill the container and are clipped accurately.
 - **Crash Fix**: Resolved "No Material widget found" error triggered during browser resizing by ensuring correct `Scaffold` wrapping at all breakpoints.
 - **Web Rendering**: Fixed `FaIcon` visibility on web by explicitly passing theme colors to the icon widgets.
+- **OS Boot Experience**: Added a startup boot sequence screen with branding, animated loading progress, intro headline ("Hi, I am Purnendu Samanta"), and automatic transition into the home launcher UI. On desktop, this now renders inside the phone frame (not full browser screen).
+- **Profile Hook**: Wired the boot avatar to load from `web/profile/purnendu.jpg` with a graceful fallback icon when the image is not yet present.
+- **Boot Visual Upgrade**: Enhanced the startup experience with a more modern Android-like aesthetic (animated dual rings around profile, staged module loader chips, dynamic boot percentage, moving light streaks, and richer progress-bar glow).
+- **Project Open Flow Upgrade**: Changed app icon taps to open a full in-app `ProjectDetailScreen` first (Android app-open feel), then redirect to external project links via an explicit "Open Actual Project" action.
+- **Dummy Project Metadata Layer**: Added placeholder project overview/tech-stack/highlights data model in the detail screen to be replaced later by Google Sheets-driven content.
+- **Detail Screen UX Refinement**: Updated the project detail page to feel like it is still inside the Android OS shell by reusing launcher-style status/navigation bars and surface cards.
+- **Real App Icon Rendering**: Replaced generic hero icon usage in detail view with actual app icon loading (`iconUrl`) plus robust fallback icon states.
+- **In-Phone Navigation Flow**: Removed route-level full-page takeover for project detail and now render details inline inside `HomeScreen` so desktop keeps the phone frame visible while detail content scrolls within the mobile UI.
+- **MVVM Refactor**: Introduced a ViewModel layer under `lib/ui/viewmodels` and migrated state/business logic out of UI screens:
+    - `HomeViewModel`: app loading/filtering, active project state, notification state machine, and interaction events.
+    - `BootSequenceViewModel`: startup transition timing and boot completion state.
+    - `ProjectDetailViewModel`: project detail data source (dummy for now) and external project open action.
+- **Per-Screen MVVM Module Structure**: Reorganized UI into screen-specific modules (each screen has its own `screen + viewmodel + widgets/` subtree), replacing the shared global `ui/widgets` + `ui/viewmodels` layout.
+- **Constants Consolidation (Design Tokens)**:
+    - Added centralized constants in `lib/core/constants` for links, sheet source URL, durations, spacing/radius/sizes, colors, and gradients.
+    - Removed hardcoded `Duration`, `Color(0x...)`, `EdgeInsets(...)`, and external URL literals from screen/widget files; they now resolve from constants.
+    - `SheetService` now reads the CSV URL from `AppLinks.googleSheetCsvUrl`.
+- **View Simplification**: Refactored `HomeScreen`, `BootSequenceScreen`, and `ProjectDetailScreen` to focus on rendering and delegate logic/actions to their respective ViewModels.
 
 ---
 
@@ -134,8 +173,8 @@ The following items are known bugs or features not working smoothly. Read this b
    - *Issue*: Dragging the Notification Panel down from the top status bar or swiping the `AppGrid` is glitchy/unreliable using a mouse cursor in a browser environment. Standard web pointer events often conflict with Flutter's gesture arenas.
    - *Status*: ✅ Resolved on March 26, 2026 (thresholded gestures + explicit desktop fallback controls + web drag-device support).
 2. **Google Sheet Link Missing**:
-   - *Issue*: `lib/services/sheet_service.dart` is missing a valid Google Sheets published CSV link.
-   - *Status*: ✅ Resolved on March 26, 2026 with real published CSV URL.
+   - *Issue*: Google Sheets source URL was previously hardcoded/unstable across files.
+   - *Status*: ✅ Resolved on March 27, 2026 by centralizing the published CSV URL in `lib/core/constants/app_links.dart` and consuming it from `SheetService`.
 4. **"No Material widget found" crash on narrow browser resize**:
    - *Issue*: Resizing the browser below 600px switches from `_DesktopLayout` (which has a `Scaffold`) to a bare `HomeScreen` with no `Material` ancestor. Widgets like `TextField`, `InkWell`, `IconButton`, etc. all require a `Material` ancestor and crash.
    - *Status*: ✅ Resolved on March 26, 2026 by wrapping the mobile `HomeScreen` path in a `Scaffold`.

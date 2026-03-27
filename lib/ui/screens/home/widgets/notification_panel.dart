@@ -1,7 +1,8 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../../core/theme/app_colors.dart';
+import 'package:my_portfolio/core/constants/app_colors.dart';
+import 'package:my_portfolio/core/constants/app_spacing.dart';
 
 class NotificationPanel extends StatefulWidget {
   final VoidCallback onClose;
@@ -44,8 +45,18 @@ class _NotificationPanelState extends State<NotificationPanel> {
   }
 
   static const _months = [
-    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
   ];
 
   String _formatDate(DateTime date) {
@@ -81,7 +92,12 @@ class _NotificationPanelState extends State<NotificationPanel> {
             left: 0,
             right: 0,
             child: Container(
-              padding: const EdgeInsets.fromLTRB(20, 60, 20, 30),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.page,
+                60,
+                AppSpacing.page,
+                30,
+              ),
               decoration: BoxDecoration(
                 color: isDark ? AppColors.darkSurface : AppColors.lightSurface,
                 borderRadius: const BorderRadius.vertical(
@@ -111,22 +127,22 @@ class _NotificationPanelState extends State<NotificationPanel> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: AppSpacing.screenHorizontal),
 
                   // Quick Highlights (Dynamic Signals)
                   _buildQuickHighlights(isDark),
 
-                  const SizedBox(height: 24),
+                  const SizedBox(height: AppSpacing.screenHorizontal),
 
                   // Micro-storytelling
                   _buildMicroStory(isDark),
 
-                  const SizedBox(height: 24),
+                  const SizedBox(height: AppSpacing.screenHorizontal),
 
                   // Resume Notification
                   _buildResumeNotification(isDark),
 
-                  const SizedBox(height: 24),
+                  const SizedBox(height: AppSpacing.screenHorizontal),
 
                   // Close Button (Subtle)
                   Center(
@@ -165,7 +181,7 @@ class _NotificationPanelState extends State<NotificationPanel> {
     return Column(
       children: [
         Container(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(AppSpacing.xl),
           decoration: BoxDecoration(
             color: (isDark ? AppColors.darkPrimary : AppColors.lightPrimary)
                 .withValues(alpha: 0.1),
@@ -177,7 +193,7 @@ class _NotificationPanelState extends State<NotificationPanel> {
             color: isDark ? AppColors.darkPrimary : AppColors.lightPrimary,
           ),
         ),
-        const SizedBox(height: 6),
+        const SizedBox(height: AppSpacing.sm),
         Text(
           label.split(' ').first,
           style: TextStyle(
@@ -194,7 +210,7 @@ class _NotificationPanelState extends State<NotificationPanel> {
   Widget _buildMicroStory(bool isDark) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppSpacing.xxxl),
       decoration: BoxDecoration(
         color: (isDark ? Colors.white : Colors.black).withValues(alpha: 0.04),
         borderRadius: BorderRadius.circular(20),
@@ -209,7 +225,7 @@ class _NotificationPanelState extends State<NotificationPanel> {
                 size: 16,
                 color: isDark ? AppColors.darkPrimary : AppColors.lightPrimary,
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppSpacing.md),
               Text(
                 "Daily Pulse",
                 style: TextStyle(
@@ -222,7 +238,7 @@ class _NotificationPanelState extends State<NotificationPanel> {
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppSpacing.md),
           Text(
             "Building the future of web experiences one pixel at a time. Currently exploring the intersection of AI and Creative Coding.",
             style: TextStyle(
@@ -248,17 +264,17 @@ class _NotificationPanelState extends State<NotificationPanel> {
       },
       borderRadius: BorderRadius.circular(20),
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppSpacing.xxxl),
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: isDark
                 ? [
-                    const Color(0xFF6366F1).withValues(alpha: 0.2),
-                    const Color(0xFF818CF8).withValues(alpha: 0.1),
+                    AppColors.lightPrimary.withValues(alpha: 0.2),
+                    AppColors.darkPrimary.withValues(alpha: 0.1),
                   ]
                 : [
-                    const Color(0xFF6366F1).withValues(alpha: 0.1),
-                    const Color(0xFF818CF8).withValues(alpha: 0.05),
+                    AppColors.lightPrimary.withValues(alpha: 0.1),
+                    AppColors.darkPrimary.withValues(alpha: 0.05),
                   ],
           ),
           borderRadius: BorderRadius.circular(20),
@@ -270,7 +286,7 @@ class _NotificationPanelState extends State<NotificationPanel> {
         child: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.all(AppSpacing.lg),
               decoration: BoxDecoration(
                 color: isDark ? AppColors.darkPrimary : AppColors.lightPrimary,
                 borderRadius: BorderRadius.circular(12),
@@ -281,7 +297,7 @@ class _NotificationPanelState extends State<NotificationPanel> {
                 size: 24,
               ),
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: AppSpacing.xxxl),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -296,7 +312,7 @@ class _NotificationPanelState extends State<NotificationPanel> {
                           : AppColors.lightOnSurface,
                     ),
                   ),
-                  const SizedBox(height: 2),
+                  const SizedBox(height: AppSpacing.xxs),
                   Text(
                     "Last updated: ${_formatDate(DateTime.now())}",
                     style: TextStyle(

@@ -1,7 +1,10 @@
 class AppLinks {
   static const github = 'https://github.com/PurnenduSamanta?tab=repositories';
+  static const githubHome = 'https://github.com';
   static const linkedIn = 'https://www.linkedin.com/in/purnendu9614/';
   static const email = 'mailto:joysamanta84@gmail.com';
+  static const googleSheetCsvUrl =
+      'https://docs.google.com/spreadsheets/d/e/2PACX-1vRFIPsBCW3RAt2OzP__ggkgM7wLh6tpTe7M9KJ4U566bH32zMOPS9WJiS6XBbCJ8yhfUx02GDE1axZH/pub?gid=0&single=true&output=csv';
   static const googlePlayConsole =
       'https://play.google.com/store/apps/developer?id=Purnendu+Samanta';
   static const resume =

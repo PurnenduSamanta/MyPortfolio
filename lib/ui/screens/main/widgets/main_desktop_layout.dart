@@ -1,36 +1,20 @@
 import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
-import '../../core/theme/app_colors.dart';
-import '../../core/theme/theme_provider.dart';
-import 'home_screen.dart';
+import 'package:my_portfolio/core/constants/app_colors.dart';
+import 'package:my_portfolio/core/constants/app_durations.dart';
+import 'package:my_portfolio/core/constants/app_gradients.dart';
+import 'package:my_portfolio/core/constants/app_spacing.dart';
 
-class MainScreen extends StatelessWidget {
-  final ThemeProvider themeProvider;
+class MainDesktopLayout extends StatelessWidget {
+  final Widget content;
+  final bool showingStartup;
 
-  const MainScreen({super.key, required this.themeProvider});
-
-  @override
-  Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final isDesktop = constraints.maxWidth > 600;
-
-        if (isDesktop) {
-          return _DesktopLayout(themeProvider: themeProvider);
-        } else {
-          return Scaffold(
-            body: HomeScreen(themeProvider: themeProvider),
-          );
-        }
-      },
-    );
-  }
-}
-
-class _DesktopLayout extends StatelessWidget {
-  final ThemeProvider themeProvider;
-
-  const _DesktopLayout({required this.themeProvider});
+  const MainDesktopLayout({
+    super.key,
+    required this.content,
+    required this.showingStartup,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -41,18 +25,8 @@ class _DesktopLayout extends StatelessWidget {
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: isDark
-                ? [
-                    const Color(0xFF0A0B14),
-                    const Color(0xFF13142A),
-                    const Color(0xFF1A1040),
-                    const Color(0xFF0F1118),
-                  ]
-                : [
-                    const Color(0xFFE8EAFE),
-                    const Color(0xFFF0E6FF),
-                    const Color(0xFFE6F0FF),
-                    const Color(0xFFF5F0FF),
-                  ],
+                ? AppGradients.desktopBackgroundDark
+                : AppGradients.desktopBackgroundLight,
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             stops: const [0.0, 0.3, 0.7, 1.0],
@@ -60,14 +34,12 @@ class _DesktopLayout extends StatelessWidget {
         ),
         child: Stack(
           children: [
-            // Animated background orbs
             _BackgroundOrbs(isDark: isDark),
-
-            // Phone frame centered
             Center(
-              child: _PhoneFrame(
+              child: MainPhoneFrame(
                 isDark: isDark,
-                themeProvider: themeProvider,
+                content: content,
+                showingStartup: showingStartup,
               ),
             ),
           ],
@@ -94,7 +66,7 @@ class _BackgroundOrbsState extends State<_BackgroundOrbs>
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: const Duration(seconds: 20),
+      duration: AppDurations.backgroundLoop,
       vsync: this,
     )..repeat();
   }
@@ -132,35 +104,23 @@ class _OrbPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final paint = Paint()..style = PaintingStyle.fill;
 
-    // Orb 1
-    paint.color = (isDark
-            ? const Color(0xFF6366F1)
-            : const Color(0xFF818CF8))
+    paint.color = (isDark ? AppColors.lightPrimary : AppColors.darkPrimary)
         .withValues(alpha: isDark ? 0.08 : 0.12);
     final x1 = size.width * 0.2 + math.sin(progress * 2 * math.pi) * 40;
     final y1 = size.height * 0.3 + math.cos(progress * 2 * math.pi) * 30;
     canvas.drawCircle(Offset(x1, y1), 120, paint);
 
-    // Orb 2
-    paint.color = (isDark
-            ? const Color(0xFFA78BFA)
-            : const Color(0xFFC4B5FD))
-        .withValues(alpha: isDark ? 0.06 : 0.10);
-    final x2 =
-        size.width * 0.8 + math.cos(progress * 2 * math.pi + 1) * 50;
-    final y2 =
-        size.height * 0.6 + math.sin(progress * 2 * math.pi + 1) * 40;
+    paint.color =
+        (isDark ? AppColors.accentVioletSoft : AppColors.accentVioletPastel)
+            .withValues(alpha: isDark ? 0.06 : 0.10);
+    final x2 = size.width * 0.8 + math.cos(progress * 2 * math.pi + 1) * 50;
+    final y2 = size.height * 0.6 + math.sin(progress * 2 * math.pi + 1) * 40;
     canvas.drawCircle(Offset(x2, y2), 150, paint);
 
-    // Orb 3
-    paint.color = (isDark
-            ? const Color(0xFF22D3EE)
-            : const Color(0xFF67E8F9))
+    paint.color = (isDark ? AppColors.accentCyan : AppColors.accentCyanSoft)
         .withValues(alpha: isDark ? 0.05 : 0.08);
-    final x3 =
-        size.width * 0.5 + math.sin(progress * 2 * math.pi + 2.5) * 35;
-    final y3 =
-        size.height * 0.8 + math.cos(progress * 2 * math.pi + 2.5) * 25;
+    final x3 = size.width * 0.5 + math.sin(progress * 2 * math.pi + 2.5) * 35;
+    final y3 = size.height * 0.8 + math.cos(progress * 2 * math.pi + 2.5) * 25;
     canvas.drawCircle(Offset(x3, y3), 100, paint);
   }
 
@@ -170,17 +130,23 @@ class _OrbPainter extends CustomPainter {
   }
 }
 
-class _PhoneFrame extends StatelessWidget {
+class MainPhoneFrame extends StatelessWidget {
   final bool isDark;
-  final ThemeProvider themeProvider;
+  final Widget content;
+  final bool showingStartup;
 
-  const _PhoneFrame({required this.isDark, required this.themeProvider});
+  const MainPhoneFrame({
+    super.key,
+    required this.isDark,
+    required this.content,
+    required this.showingStartup,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 380,
-      height: 780,
+      width: AppSizes.phoneWidth,
+      height: AppSizes.phoneHeight,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(44),
         border: Border.all(
@@ -190,22 +156,17 @@ class _PhoneFrame extends StatelessWidget {
           width: 2,
         ),
         boxShadow: [
-          // Outer glow
           BoxShadow(
-            color: (isDark
-                    ? AppColors.darkPrimary
-                    : AppColors.lightPrimary)
+            color: (isDark ? AppColors.darkPrimary : AppColors.lightPrimary)
                 .withValues(alpha: 0.15),
             blurRadius: 60,
             spreadRadius: 5,
           ),
-          // Deep shadow
           BoxShadow(
             color: Colors.black.withValues(alpha: isDark ? 0.5 : 0.2),
             blurRadius: 30,
             offset: const Offset(0, 10),
           ),
-          // Inner ambient
           BoxShadow(
             color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.1),
             blurRadius: 15,
@@ -217,22 +178,27 @@ class _PhoneFrame extends StatelessWidget {
         borderRadius: BorderRadius.circular(42),
         child: Stack(
           children: [
-            // Home screen content
-            HomeScreen(themeProvider: themeProvider),
-
-            // Notch / Dynamic Island
+            AnimatedSwitcher(
+              duration: AppDurations.transition,
+              switchInCurve: Curves.easeOutCubic,
+              switchOutCurve: Curves.easeInCubic,
+              child: KeyedSubtree(
+                key: ValueKey<bool>(showingStartup),
+                child: content,
+              ),
+            ),
             Positioned(
               top: 0,
               left: 0,
               right: 0,
               child: Center(
                 child: Container(
-                  margin: const EdgeInsets.only(top: 10),
+                  margin: const EdgeInsets.only(top: AppSpacing.lg),
                   width: 100,
                   height: 28,
                   decoration: BoxDecoration(
                     color: Colors.black,
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(AppRadius.xl),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,

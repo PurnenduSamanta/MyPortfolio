@@ -1,17 +1,16 @@
 import 'package:http/http.dart' as http;
+import '../core/constants/app_links.dart';
 import '../data/model/app_item.dart';
 
 class SheetService {
-  // Replace this with your published Google Sheet CSV URL
-  // Format: https://docs.google.com/spreadsheets/d/e/{SHEET_ID}/pub?output=csv
-  static const String _sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRFIPsBCW3RAt2OzP__ggkgM7wLh6tpTe7M9KJ4U566bH32zMOPS9WJiS6XBbCJ8yhfUx02GDE1axZH/pub?gid=0&single=true&output=csv';
-
   Future<List<AppItem>> fetchApps() async {
-    if (_sheetUrl.isEmpty) {
+    if (AppLinks.googleSheetCsvUrl.isEmpty) {
       throw Exception('Google Sheet URL not configured');
     }
 
-    final response = await http.get(Uri.parse(_sheetUrl));
+    final response = await http.get(
+      Uri.parse(AppLinks.googleSheetCsvUrl),
+    );
 
     if (response.statusCode == 200) {
       return _parseCsv(response.body);

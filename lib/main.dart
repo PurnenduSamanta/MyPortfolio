@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_provider.dart';
-import 'ui/screens/main_screen.dart';
+import 'ui/screens/boot_sequence/boot_sequence_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -36,7 +36,7 @@ class _MyPortfolioAppState extends State<MyPortfolioApp> {
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: _themeProvider.themeMode,
-      home: MainScreen(themeProvider: _themeProvider),
+      home: BootSequenceScreen(themeProvider: _themeProvider),
     );
   }
 }

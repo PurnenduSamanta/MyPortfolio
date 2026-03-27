@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import '../../core/theme/app_colors.dart';
+import 'package:my_portfolio/core/constants/app_colors.dart';
+import 'package:my_portfolio/core/constants/app_spacing.dart';
 
-class StatusBarWidget extends StatelessWidget {
-  final VoidCallback? onNotificationTap;
-
-  const StatusBarWidget({super.key, this.onNotificationTap});
+class ProjectStatusBarWidget extends StatelessWidget {
+  const ProjectStatusBarWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -14,11 +13,13 @@ class StatusBarWidget extends StatelessWidget {
         : AppColors.lightOnSurface;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.page,
+        vertical: AppSpacing.sm,
+      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Time
           Text(
             _getFormattedTime(),
             style: TextStyle(
@@ -28,29 +29,12 @@ class StatusBarWidget extends StatelessWidget {
               letterSpacing: 0.3,
             ),
           ),
-          // Status icons
           Row(
             children: [
-              GestureDetector(
-                onTap: onNotificationTap,
-                behavior: HitTestBehavior.translucent,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 2),
-                  child: Icon(
-                    Icons.keyboard_arrow_down_rounded,
-                    color: textColor,
-                    size: 18,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 4),
-              // Signal
               Icon(Icons.signal_cellular_alt, color: textColor, size: 16),
-              const SizedBox(width: 6),
-              // WiFi
+              const SizedBox(width: AppSpacing.sm),
               Icon(Icons.wifi, color: textColor, size: 16),
-              const SizedBox(width: 6),
-              // Battery
+              const SizedBox(width: AppSpacing.sm),
               Icon(Icons.battery_std, color: textColor, size: 16),
             ],
           ),

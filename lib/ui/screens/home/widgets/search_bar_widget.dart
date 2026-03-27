@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../core/theme/app_colors.dart';
+import 'package:my_portfolio/core/constants/app_colors.dart';
+import 'package:my_portfolio/core/constants/app_spacing.dart';
 
 class SearchBarWidget extends StatelessWidget {
   final Function(String) onSearch;
@@ -16,12 +17,15 @@ class SearchBarWidget extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.page,
+        vertical: AppSpacing.md,
+      ),
       child: Container(
         height: 44,
         decoration: BoxDecoration(
           color: isDark ? AppColors.darkSearchBar : AppColors.lightSearchBar,
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(AppRadius.xxl),
           border: Border.all(
             color: (isDark ? Colors.white : Colors.black).withValues(
               alpha: 0.08,
@@ -91,7 +95,7 @@ class SearchBarWidget extends StatelessWidget {
               minHeight: 44,
             ),
             border: InputBorder.none,
-            contentPadding: const EdgeInsets.symmetric(vertical: 11),
+            contentPadding: const EdgeInsets.symmetric(vertical: AppSpacing.xl),
           ),
         ),
       ),

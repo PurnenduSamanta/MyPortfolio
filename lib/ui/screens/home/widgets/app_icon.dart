@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
-import 'package:url_launcher/url_launcher.dart';
-import '../../data/model/app_item.dart';
-import '../../core/theme/app_colors.dart';
+import 'package:my_portfolio/core/constants/app_colors.dart';
+import 'package:my_portfolio/core/constants/app_durations.dart';
+import 'package:my_portfolio/core/constants/app_gradients.dart';
+import 'package:my_portfolio/core/constants/app_spacing.dart';
+import 'package:my_portfolio/data/model/app_item.dart';
 
 class AppIcon extends StatefulWidget {
   final AppItem appItem;
+  final ValueChanged<AppItem>? onTap;
 
-  const AppIcon({super.key, required this.appItem});
+  const AppIcon({super.key, required this.appItem, this.onTap});
 
   @override
   State<AppIcon> createState() => _AppIconState();
@@ -16,11 +19,8 @@ class AppIcon extends StatefulWidget {
 class _AppIconState extends State<AppIcon> {
   bool _isPressed = false;
 
-  Future<void> _onTap() async {
-    final url = Uri.parse(widget.appItem.link);
-    if (await canLaunchUrl(url)) {
-      await launchUrl(url, mode: LaunchMode.externalApplication);
-    }
+  void _onTap() {
+    widget.onTap?.call(widget.appItem);
   }
 
   @override
@@ -42,7 +42,7 @@ class _AppIconState extends State<AppIcon> {
         setState(() => _isPressed = false);
       },
       child: AnimatedScale(
-        duration: const Duration(milliseconds: 110),
+        duration: AppDurations.ultraFast,
         curve: Curves.easeOutCubic,
         scale: _isPressed ? 0.92 : 1.0,
         child: Center(
@@ -59,7 +59,7 @@ class _AppIconState extends State<AppIcon> {
                       width: 56,
                       height: 56,
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(AppRadius.lg),
                         boxShadow: kIsWeb
                             ? const []
                             : [
@@ -77,11 +77,11 @@ class _AppIconState extends State<AppIcon> {
                               ],
                       ),
                       child: ClipRRect(
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(AppRadius.lg),
                         child: _buildIcon(isDark),
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: AppSpacing.md),
                     SizedBox(
                       width: 72,
                       child: Text(
@@ -175,13 +175,13 @@ class _AppIconState extends State<AppIcon> {
       height: 56,
       decoration: const BoxDecoration(
         gradient: LinearGradient(
-          colors: [Color(0xFF2563EB), Color(0xFF1D4ED8)],
+          colors: AppGradients.resumeIcon,
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
       ),
       child: const Padding(
-        padding: EdgeInsets.all(6),
+        padding: EdgeInsets.all(AppSpacing.sm),
         child: Icon(Icons.description_rounded, color: Colors.white, size: 18),
       ),
     );
@@ -206,20 +206,7 @@ class _AppIconState extends State<AppIcon> {
   }
 
   List<Color> _getGradientColors(int hash) {
-    final gradients = [
-      [const Color(0xFF667EEA), const Color(0xFF764BA2)],
-      [const Color(0xFFF093FB), const Color(0xFFF5576C)],
-      [const Color(0xFF4FACFE), const Color(0xFF00F2FE)],
-      [const Color(0xFF43E97B), const Color(0xFF38F9D7)],
-      [const Color(0xFFFA709A), const Color(0xFFFEE140)],
-      [const Color(0xFFA18CD1), const Color(0xFFFBC2EB)],
-      [const Color(0xFFFCCB90), const Color(0xFFD57EEB)],
-      [const Color(0xFF13547A), const Color(0xFF80D0C7)],
-      [const Color(0xFFFF9A9E), const Color(0xFFFECFEF)],
-      [const Color(0xFF96FBC4), const Color(0xFFF9F586)],
-      [const Color(0xFF0BA360), const Color(0xFF3CBA92)],
-      [const Color(0xFFFF6B6B), const Color(0xFFFFE66D)],
-    ];
-    return gradients[hash.abs() % gradients.length];
+    return AppGradients.appIconPalettes[hash.abs() %
+        AppGradients.appIconPalettes.length];
   }
 }

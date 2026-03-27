@@ -1,13 +1,16 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import '../../data/model/app_item.dart';
+import 'package:my_portfolio/core/constants/app_durations.dart';
+import 'package:my_portfolio/core/constants/app_spacing.dart';
+import 'package:my_portfolio/data/model/app_item.dart';
 import 'app_icon.dart';
 
 class AppGrid extends StatefulWidget {
   final List<AppItem> apps;
+  final ValueChanged<AppItem>? onAppTap;
 
-  const AppGrid({super.key, required this.apps});
+  const AppGrid({super.key, required this.apps, this.onAppTap});
 
   @override
   State<AppGrid> createState() => _AppGridState();
@@ -22,7 +25,7 @@ class _AppGridState extends State<AppGrid> {
     if (!_pageController.hasClients) return;
     await _pageController.animateToPage(
       page,
-      duration: const Duration(milliseconds: 260),
+      duration: AppDurations.page,
       curve: Curves.easeOutCubic,
     );
   }
@@ -68,11 +71,11 @@ class _AppGridState extends State<AppGrid> {
                     widget.apps.length,
                   );
                   final pageApps = widget.apps.sublist(startIndex, endIndex);
-                  const horizontalPadding = 20.0;
-                  const verticalPadding = 16.0;
+                  const horizontalPadding = AppSpacing.page;
+                  const verticalPadding = AppSpacing.xxxl;
                   const crossAxisCount = 4;
-                  const mainAxisSpacing = 16.0;
-                  const crossAxisSpacing = 8.0;
+                  const mainAxisSpacing = AppSpacing.xxxl;
+                  const crossAxisSpacing = AppSpacing.md;
 
                   return LayoutBuilder(
                     builder: (context, constraints) {
@@ -109,7 +112,10 @@ class _AppGridState extends State<AppGrid> {
                         itemBuilder: (context, index) {
                           return RepaintBoundary(
                             key: ValueKey(pageApps[index].name),
-                            child: AppIcon(appItem: pageApps[index]),
+                            child: AppIcon(
+                              appItem: pageApps[index],
+                              onTap: widget.onAppTap,
+                            ),
                           );
                         },
                       );
@@ -119,7 +125,7 @@ class _AppGridState extends State<AppGrid> {
               ),
               if (isDesktopWeb && pagesCount > 1 && _currentPage > 0)
                 Positioned(
-                  left: 6,
+                  left: AppSpacing.sm,
                   top: 0,
                   bottom: 0,
                   child: Center(
@@ -143,7 +149,7 @@ class _AppGridState extends State<AppGrid> {
                   pagesCount > 1 &&
                   _currentPage < pagesCount - 1)
                 Positioned(
-                  right: 6,
+                  right: AppSpacing.sm,
                   top: 0,
                   bottom: 0,
                   child: Center(
@@ -168,15 +174,15 @@ class _AppGridState extends State<AppGrid> {
         ),
         if (pagesCount > 1)
           Padding(
-            padding: const EdgeInsets.only(bottom: 12),
+            padding: const EdgeInsets.only(bottom: AppSpacing.xl),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: List.generate(pagesCount, (index) {
                 return AnimatedContainer(
-                  duration: const Duration(milliseconds: 300),
-                  margin: const EdgeInsets.symmetric(horizontal: 4),
-                  width: _currentPage == index ? 8 : 6,
-                  height: _currentPage == index ? 8 : 6,
+                  duration: AppDurations.transition,
+                  margin: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
+                  width: _currentPage == index ? AppSpacing.md : AppSpacing.sm,
+                  height: _currentPage == index ? AppSpacing.md : AppSpacing.sm,
                   decoration: BoxDecoration(
                     color: _currentPage == index
                         ? (Theme.of(context).brightness == Brightness.dark

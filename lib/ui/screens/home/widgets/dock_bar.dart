@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../../core/constants/app_links.dart';
-import '../../core/theme/app_colors.dart';
-import '../../core/theme/theme_provider.dart';
+import 'package:my_portfolio/core/constants/app_colors.dart';
+import 'package:my_portfolio/core/constants/app_durations.dart';
+import 'package:my_portfolio/core/constants/app_gradients.dart';
+import 'package:my_portfolio/core/constants/app_links.dart';
+import 'package:my_portfolio/core/constants/app_spacing.dart';
+import 'package:my_portfolio/core/theme/theme_provider.dart';
 
 class DockBar extends StatelessWidget {
   final ThemeProvider themeProvider;
@@ -22,13 +25,19 @@ class DockBar extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      margin: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.screenHorizontal,
+        vertical: AppSpacing.lg,
+      ),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.page,
+        vertical: AppSpacing.lg,
+      ),
       decoration: BoxDecoration(
         color: (isDark ? AppColors.darkDock : AppColors.lightDock).withValues(
           alpha: 0.85,
         ),
-        borderRadius: BorderRadius.circular(28),
+        borderRadius: BorderRadius.circular(AppRadius.xxl + AppSpacing.xs),
         border: Border.all(
           color: (isDark ? Colors.white : Colors.black).withValues(alpha: 0.08),
           width: 0.5,
@@ -106,10 +115,7 @@ class _DockIconState extends State<_DockIcon>
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 120),
-      vsync: this,
-    );
+    _controller = AnimationController(duration: AppDurations.fast, vsync: this);
     _scale = Tween<double>(
       begin: 1.0,
       end: 0.85,
@@ -182,7 +188,7 @@ class _ThemeToggleIconState extends State<_ThemeToggleIcon>
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: const Duration(milliseconds: 350),
+      duration: AppDurations.transition,
       vsync: this,
     );
     _rotation = Tween<double>(
@@ -227,8 +233,8 @@ class _ThemeToggleIconState extends State<_ThemeToggleIcon>
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: widget.isDark
-                    ? [const Color(0xFF667EEA), const Color(0xFF764BA2)]
-                    : [const Color(0xFFF093FB), const Color(0xFFF5576C)],
+                    ? AppGradients.themeToggleDark
+                    : AppGradients.themeToggleLight,
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
