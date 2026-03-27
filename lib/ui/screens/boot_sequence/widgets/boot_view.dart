@@ -73,24 +73,9 @@ class BootView extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         _BootAvatar(progress: p, imagePath: _profileImagePath),
-                        const SizedBox(height: AppSpacing.screenHorizontal),
-                        Text(
-                          'PURNENDU OS',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 12.5,
-                            letterSpacing: 4.0,
-                            fontWeight: FontWeight.w700,
-                            color:
-                                (isDark
-                                        ? AppColors.darkPrimary
-                                        : AppColors.lightPrimary)
-                                    .withValues(alpha: 0.9),
-                          ),
-                        ),
                         const SizedBox(height: AppSpacing.xxl),
                         Text(
-                          'Hi, I am Purnendu Samanta',
+                          'Hi👏, I am Purnendu Samanta',
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 27,
@@ -102,7 +87,7 @@ class BootView extends StatelessWidget {
                         ),
                         const SizedBox(height: AppSpacing.lg),
                         Text(
-                          'Android app developer with 3+ years of experience.',
+                          'Mobile app developer with 3+ years of experience.',
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 15,
@@ -116,8 +101,6 @@ class BootView extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: AppSpacing.xxl + AppSpacing.md),
-                        _BootModuleTracker(progress: p, isDark: isDark),
-                        const SizedBox(height: AppSpacing.screenHorizontal),
                         _BootProgress(isDark: isDark, progress: p),
                         const SizedBox(height: AppSpacing.lg),
                         Row(
@@ -172,19 +155,6 @@ class BootView extends StatelessWidget {
                               ),
                             ),
                           ],
-                        ),
-                        const SizedBox(height: AppSpacing.lg),
-                        Text(
-                          'Android-inspired launcher startup',
-                          style: TextStyle(
-                            fontSize: 11,
-                            letterSpacing: 0.3,
-                            color: isDark
-                                ? AppColors.darkOnSurface.withValues(alpha: 0.4)
-                                : AppColors.lightOnSurface.withValues(
-                                    alpha: 0.36,
-                                  ),
-                          ),
                         ),
                       ],
                     ),
@@ -374,87 +344,6 @@ class _BootAvatar extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-class _BootModuleTracker extends StatelessWidget {
-  final double progress;
-  final bool isDark;
-
-  const _BootModuleTracker({required this.progress, required this.isDark});
-
-  @override
-  Widget build(BuildContext context) {
-    final stage = (progress * 3).floor().clamp(0, 2);
-    const labels = ['Core', 'Material Engine', 'Launcher'];
-
-    return Wrap(
-      alignment: WrapAlignment.center,
-      runSpacing: AppSpacing.md,
-      children: List.generate(labels.length, (index) {
-        final isComplete = index < stage;
-        final isActive = index == stage;
-        final bg = isComplete
-            ? AppColors.accentTeal.withValues(alpha: isDark ? 0.18 : 0.16)
-            : isActive
-            ? AppColors.accentBlueSoft.withValues(alpha: isDark ? 0.18 : 0.16)
-            : (isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.06));
-
-        return Padding(
-          padding: EdgeInsets.only(
-            right: index == labels.length - 1 ? 0 : AppSpacing.md,
-          ),
-          child: Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.lg,
-              vertical: AppSpacing.sm,
-            ),
-            decoration: BoxDecoration(
-              color: bg,
-              borderRadius: BorderRadius.circular(AppRadius.pill),
-              border: Border.all(
-                color: isComplete
-                    ? AppColors.accentTeal.withValues(alpha: 0.42)
-                    : isActive
-                    ? AppColors.accentBlueSoft.withValues(alpha: 0.45)
-                    : (isDark ? Colors.white24 : Colors.black12),
-              ),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  isComplete
-                      ? Icons.check_circle_rounded
-                      : isActive
-                      ? Icons.sync_rounded
-                      : Icons.circle_outlined,
-                  size: 13,
-                  color: isComplete
-                      ? AppColors.accentTeal
-                      : isActive
-                      ? AppColors.accentBlueSoft
-                      : (isDark
-                            ? AppColors.darkOnSurface.withValues(alpha: 0.55)
-                            : AppColors.lightOnSurface.withValues(alpha: 0.45)),
-                ),
-                const SizedBox(width: AppSpacing.sm),
-                Text(
-                  labels[index],
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                    color: isDark
-                        ? AppColors.darkOnSurface.withValues(alpha: 0.82)
-                        : AppColors.lightOnSurface.withValues(alpha: 0.72),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      }),
     );
   }
 }
