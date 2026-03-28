@@ -194,6 +194,18 @@ Avoid over-engineering. DO NOT implement:
     - `ProjectDetailViewModel` uses real data when available, falls back to dummy data when fields are empty.
     - Top bar badge dynamically shows "Live" vs "Preview" based on data availability.
 - **Cleanup**: Removed profile avatar from status bar (now lives in music player widget). Removed all temporary debug prints.
+- **3D Phone Frame (Desktop)**: Redesigned the desktop phone frame with a realistic 3D appearance.
+    - Added physical **Volume Up / Volume Down** buttons on the left side and a **Power button** on the right.
+    - Side buttons use metallic gradients matching the frame color with drop shadows for depth.
+    - Frame uses a **silver metallic finish** with beveled edge gradient (highlight → silver → shadow) on both dark and light themes.
+    - Enhanced shadow system: primary glow + deep drop shadow + tight contact shadow + left-edge highlight for a floating effect.
+    - Added a subtle **screen reflection** gradient at the top-left of the display for glass-like realism.
+    - Added a **speaker grill** in the top bezel — a 56px pill-shaped slit with 10 vertical bars simulating a real speaker mesh.
+    - Cleaned up the Dynamic Island — removed the camera lens circle, now a clean solid black pill.
+- **App Grid Pagination Fix**: Fixed a regression where all app icons were shrinking to fit on a single page.
+    - Reduced `_iconsPerPage` from 20 (5 rows) to 16 (4 rows of 4 columns).
+    - Replaced dynamic `LayoutBuilder` + adaptive aspect ratio with a fixed `childAspectRatio: 0.85` for consistent icon sizing.
+    - Icons now maintain a comfortable size; extra icons properly overflow to swipeable pages.
 
 ---
 

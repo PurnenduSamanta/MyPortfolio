@@ -19,7 +19,7 @@ class AppGrid extends StatefulWidget {
 class _AppGridState extends State<AppGrid> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
-  static const int _iconsPerPage = 20;
+  static const int _iconsPerPage = 16; // 4 columns × 4 rows
 
   Future<void> _goToPage(int page) async {
     if (!_pageController.hasClients) return;
@@ -71,53 +71,28 @@ class _AppGridState extends State<AppGrid> {
                     widget.apps.length,
                   );
                   final pageApps = widget.apps.sublist(startIndex, endIndex);
-                  const horizontalPadding = AppSpacing.page;
-                  const verticalPadding = AppSpacing.xxxl;
-                  const crossAxisCount = 4;
-                  const mainAxisSpacing = AppSpacing.xxxl;
-                  const crossAxisSpacing = AppSpacing.md;
 
-                  return LayoutBuilder(
-                    builder: (context, constraints) {
-                      final rowCount = (pageApps.length / crossAxisCount)
-                          .ceil()
-                          .clamp(1, 5);
-                      final tileWidth =
-                          (constraints.maxWidth -
-                              (horizontalPadding * 2) -
-                              ((crossAxisCount - 1) * crossAxisSpacing)) /
-                          crossAxisCount;
-                      final usableHeight =
-                          constraints.maxHeight -
-                          (verticalPadding * 2) -
-                          ((rowCount - 1) * mainAxisSpacing);
-                      final tileHeight = usableHeight / rowCount;
-                      final adaptiveAspectRatio = (tileWidth / tileHeight)
-                          .clamp(0.82, 1.2);
-
-                      return GridView.builder(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: horizontalPadding,
-                          vertical: verticalPadding,
+                  return GridView.builder(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.page,
+                      vertical: AppSpacing.xxxl,
+                    ),
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 4,
+                      mainAxisSpacing: AppSpacing.xxxl,
+                      crossAxisSpacing: AppSpacing.md,
+                      childAspectRatio: 0.85,
+                    ),
+                    itemCount: pageApps.length,
+                    itemBuilder: (context, index) {
+                      return RepaintBoundary(
+                        key: ValueKey(pageApps[index].name),
+                        child: AppIcon(
+                          appItem: pageApps[index],
+                          onTap: widget.onAppTap,
                         ),
-                        physics:
-                            const NeverScrollableScrollPhysics(), // Scroll handled by PageView
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: crossAxisCount,
-                          mainAxisSpacing: mainAxisSpacing,
-                          crossAxisSpacing: crossAxisSpacing,
-                          childAspectRatio: adaptiveAspectRatio,
-                        ),
-                        itemCount: pageApps.length,
-                        itemBuilder: (context, index) {
-                          return RepaintBoundary(
-                            key: ValueKey(pageApps[index].name),
-                            child: AppIcon(
-                              appItem: pageApps[index],
-                              onTap: widget.onAppTap,
-                            ),
-                          );
-                        },
                       );
                     },
                   );

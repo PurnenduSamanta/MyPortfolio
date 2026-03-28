@@ -142,76 +142,214 @@ class MainPhoneFrame extends StatelessWidget {
     required this.showingStartup,
   });
 
+  static const _frameRadius = 44.0;
+  static const _innerRadius = 42.0;
+  static const _frameThickness = 3.0;
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: AppSizes.phoneWidth,
+    // Silver metallic frame colors
+    final frameColor = isDark
+        ? const Color(0xFF8A8D96)
+        : const Color(0xFFC0C4CC);
+    final frameHighlight = isDark
+        ? const Color(0xFFAEB1B9)
+        : const Color(0xFFE2E4E8);
+    final frameShadowColor = isDark
+        ? const Color(0xFF3A3D45)
+        : const Color(0xFF8F929A);
+
+    return SizedBox(
+      // Extra width for side buttons
+      width: AppSizes.phoneWidth + 20,
       height: AppSizes.phoneHeight,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(44),
-        border: Border.all(
-          color: isDark
-              ? Colors.white.withValues(alpha: 0.12)
-              : Colors.black.withValues(alpha: 0.08),
-          width: 2,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: (isDark ? AppColors.darkPrimary : AppColors.lightPrimary)
-                .withValues(alpha: 0.15),
-            blurRadius: 60,
-            spreadRadius: 5,
-          ),
-          BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.5 : 0.2),
-            blurRadius: 30,
-            offset: const Offset(0, 10),
-          ),
-          BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.1),
-            blurRadius: 15,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(42),
-        child: Stack(
-          children: [
-            AnimatedSwitcher(
-              duration: AppDurations.transition,
-              switchInCurve: Curves.easeOutCubic,
-              switchOutCurve: Curves.easeInCubic,
-              child: KeyedSubtree(
-                key: ValueKey<bool>(showingStartup),
-                child: content,
-              ),
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          // === LEFT SIDE BUTTONS (Volume Up + Down) ===
+          // Volume Up
+          Positioned(
+            left: 0,
+            top: 160,
+            child: _SideButton(
+              isDark: isDark,
+              height: 44,
+              isLeft: true,
+              frameColor: frameColor,
             ),
-            Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              child: Center(
-                child: Container(
-                  margin: const EdgeInsets.only(top: AppSpacing.lg),
-                  width: 100,
-                  height: 28,
-                  decoration: BoxDecoration(
-                    color: Colors.black,
-                    borderRadius: BorderRadius.circular(AppRadius.xl),
+          ),
+          // Volume Down
+          Positioned(
+            left: 0,
+            top: 216,
+            child: _SideButton(
+              isDark: isDark,
+              height: 44,
+              isLeft: true,
+              frameColor: frameColor,
+            ),
+          ),
+
+          // === RIGHT SIDE BUTTON (Power) ===
+          Positioned(
+            right: 0,
+            top: 190,
+            child: _SideButton(
+              isDark: isDark,
+              height: 52,
+              isLeft: false,
+              frameColor: frameColor,
+            ),
+          ),
+
+          // === PHONE BODY ===
+          Center(
+            child: Container(
+              width: AppSizes.phoneWidth,
+              height: AppSizes.phoneHeight,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(_frameRadius),
+                // Metallic frame gradient (simulates edge bevel)
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    frameHighlight,
+                    frameColor,
+                    frameColor,
+                    frameShadowColor,
+                  ],
+                  stops: const [0.0, 0.15, 0.85, 1.0],
+                ),
+                boxShadow: [
+                  // Primary glow
+                  BoxShadow(
+                    color:
+                        (isDark ? AppColors.darkPrimary : AppColors.lightPrimary)
+                            .withValues(alpha: 0.12),
+                    blurRadius: 80,
+                    spreadRadius: 8,
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  // Bottom drop shadow (3D lift)
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: isDark ? 0.55 : 0.22),
+                    blurRadius: 40,
+                    offset: const Offset(0, 16),
+                  ),
+                  // Tight shadow for depth
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.12),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                  // Left edge highlight
+                  BoxShadow(
+                    color: (isDark ? Colors.white : Colors.white)
+                        .withValues(alpha: isDark ? 0.04 : 0.12),
+                    blurRadius: 2,
+                    offset: const Offset(-1, 0),
+                  ),
+                ],
+              ),
+              child: Container(
+                margin: const EdgeInsets.all(_frameThickness),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(_innerRadius),
+                  color: isDark ? AppColors.darkBackground : AppColors.lightBackground,
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(_innerRadius),
+                  child: Stack(
                     children: [
-                      Container(
-                        width: 10,
-                        height: 10,
-                        decoration: BoxDecoration(
-                          color: Colors.grey.shade900,
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: Colors.grey.shade800,
-                            width: 1.5,
+                      // Screen content
+                      AnimatedSwitcher(
+                        duration: AppDurations.transition,
+                        switchInCurve: Curves.easeOutCubic,
+                        switchOutCurve: Curves.easeInCubic,
+                        child: KeyedSubtree(
+                          key: ValueKey<bool>(showingStartup),
+                          child: content,
+                        ),
+                      ),
+
+                      // Speaker Grill (top bezel)
+                      Positioned(
+                        top: 2,
+                        left: 0,
+                        right: 0,
+                        child: Center(
+                          child: Container(
+                            width: 56,
+                            height: 5,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(3),
+                              color: isDark
+                                  ? Colors.black.withValues(alpha: 0.7)
+                                  : Colors.black.withValues(alpha: 0.15),
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(3),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: List.generate(
+                                  10,
+                                  (i) => Container(
+                                    width: 1.5,
+                                    height: 5,
+                                    margin: const EdgeInsets.symmetric(
+                                      horizontal: 1.2,
+                                    ),
+                                    color: isDark
+                                        ? Colors.grey.shade900
+                                            .withValues(alpha: 0.6)
+                                        : Colors.black
+                                            .withValues(alpha: 0.08),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      // Dynamic Island (Notch) — clean pill, no camera
+                      Positioned(
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        child: Center(
+                          child: Container(
+                            margin: const EdgeInsets.only(top: AppSpacing.lg),
+                            width: 100,
+                            height: 28,
+                            decoration: BoxDecoration(
+                              color: Colors.black,
+                              borderRadius: BorderRadius.circular(AppRadius.xl),
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      // Top left screen reflection (3D shine)
+                      Positioned(
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        child: IgnorePointer(
+                          child: Container(
+                            height: 180,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(_innerRadius),
+                              gradient: LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [
+                                  Colors.white
+                                      .withValues(alpha: isDark ? 0.02 : 0.06),
+                                  Colors.transparent,
+                                ],
+                              ),
+                            ),
                           ),
                         ),
                       ),
@@ -220,9 +358,67 @@ class MainPhoneFrame extends StatelessWidget {
                 ),
               ),
             ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Side button widget for volume and power buttons
+class _SideButton extends StatelessWidget {
+  final bool isDark;
+  final double height;
+  final bool isLeft;
+  final Color frameColor;
+
+  const _SideButton({
+    required this.isDark,
+    required this.height,
+    required this.isLeft,
+    required this.frameColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final buttonWidth = 4.0;
+    // Offset to overlap with the phone frame edge
+    final edgeOffset = isLeft ? 7.0 : 7.0;
+
+    return Transform.translate(
+      offset: Offset(isLeft ? edgeOffset : -edgeOffset, 0),
+      child: Container(
+        width: buttonWidth,
+        height: height,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.horizontal(
+            left: isLeft ? const Radius.circular(2.5) : Radius.zero,
+            right: isLeft ? Radius.zero : const Radius.circular(2.5),
+          ),
+          gradient: LinearGradient(
+            begin: isLeft ? Alignment.centerLeft : Alignment.centerRight,
+            end: isLeft ? Alignment.centerRight : Alignment.centerLeft,
+            colors: [
+              isDark
+                  ? Colors.white.withValues(alpha: 0.1)
+                  : Colors.white.withValues(alpha: 0.5),
+              frameColor,
+              isDark
+                  ? Colors.black.withValues(alpha: 0.3)
+                  : Colors.black.withValues(alpha: 0.1),
+            ],
+            stops: const [0.0, 0.4, 1.0],
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: isDark ? 0.4 : 0.15),
+              blurRadius: 3,
+              offset: Offset(isLeft ? -1 : 1, 1),
+            ),
           ],
         ),
       ),
     );
   }
 }
+
