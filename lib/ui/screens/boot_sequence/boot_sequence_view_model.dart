@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:my_portfolio/core/constants/app_durations.dart';
 import 'package:my_portfolio/data/repository/app_repository.dart';
 import 'package:my_portfolio/data/model/app_item.dart';
+import 'package:my_portfolio/core/utils/favicon_helper.dart';
 
 class BootSequenceViewModel extends ChangeNotifier {
   static const Duration bootDuration = AppDurations.boot;
@@ -76,6 +77,7 @@ class BootSequenceViewModel extends ChangeNotifier {
       if (itemWithImage != null) {
         _profileImageUrl = itemWithImage.profileImage;
         debugPrint('[Boot] profileImageUrl: $_profileImageUrl');
+        updateFavicon(_profileImageUrl!);
         notifyListeners(); // triggers Screen rebuild → precacheImage
       } else {
         debugPrint('[Boot] No profileImage found, marking ready');

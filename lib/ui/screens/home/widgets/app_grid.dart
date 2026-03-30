@@ -77,7 +77,7 @@ class _AppGridState extends State<AppGrid> {
                       horizontal: AppSpacing.page,
                       vertical: AppSpacing.xxxl,
                     ),
-                    physics: const NeverScrollableScrollPhysics(),
+                    physics: const BouncingScrollPhysics(),
                     gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 4,

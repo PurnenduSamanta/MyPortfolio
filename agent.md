@@ -207,6 +207,17 @@ Avoid over-engineering. DO NOT implement:
     - Replaced dynamic `LayoutBuilder` + adaptive aspect ratio with a fixed `childAspectRatio: 0.85` for consistent icon sizing.
     - Icons now maintain a comfortable size; extra icons properly overflow to swipeable pages.
 
+### Day 5 – March 30, 2026
+**Tasks completed:**
+- **Responsive Phone Frame Fix**: Fixed an issue where the desktop phone frame would clip vertically on smaller laptop monitors (13-14 inch screens).
+    - Reduced the static `AppSizes.phoneHeight` lock on the inner content.
+    - Added a responsive `phoneHeight` constraint using `MediaQuery` bounded between 500px and 780px.
+    - Changed AppGrid's internal `GridView` scrolling physics from `NeverScrollableScrollPhysics` to `BouncingScrollPhysics` so that if the window shrinks height-wise, the 4th row of apps can still be smoothly scrolled to.
+- **Dynamic App Icon (Favicon)**: Enabled dynamic updating of the web browser's tab icon to match the user's `ProfileImage`.
+    - Added a static, lightweight inline SVG (`web/favicon.svg`) showcasing a sleek user/portfolio silhouette to replace the default Flutter "F" logo. This ensures an immediate, professional brand appearance before data loads.
+    - Created `FaviconHelper` (`lib/core/utils/favicon_helper.dart`) with environment-safe conditional imports (`favicon_stub.dart` vs `favicon_web.dart`) to avoid breaking native Android/iOS compilation.
+    - Integrated with `BootSequenceViewModel` to extract the Google Sheet profile image and inject it into the `<link rel="icon">` and `<link rel="apple-touch-icon">` tags using `dart:html` exactly when the app finishes analyzing Boot data.
+
 ---
 
 ## ⚠️ 5. Active Issues & Fixes Needed

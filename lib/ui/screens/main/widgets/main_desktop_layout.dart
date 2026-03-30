@@ -159,10 +159,14 @@ class MainPhoneFrame extends StatelessWidget {
         ? const Color(0xFF3A3D45)
         : const Color(0xFF8F929A);
 
+    // Responsive height: max 780, but shrinks on smaller screens
+    final viewportHeight = MediaQuery.of(context).size.height;
+    final phoneHeight = viewportHeight.clamp(500.0, AppSizes.phoneHeight + 40) - 40;
+
     return SizedBox(
       // Extra width for side buttons
       width: AppSizes.phoneWidth + 20,
-      height: AppSizes.phoneHeight,
+      height: phoneHeight,
       child: Stack(
         clipBehavior: Clip.none,
         children: [
@@ -206,7 +210,7 @@ class MainPhoneFrame extends StatelessWidget {
           Center(
             child: Container(
               width: AppSizes.phoneWidth,
-              height: AppSizes.phoneHeight,
+              height: phoneHeight,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(_frameRadius),
                 // Metallic frame gradient (simulates edge bevel)
