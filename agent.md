@@ -218,6 +218,37 @@ Avoid over-engineering. DO NOT implement:
     - Created `FaviconHelper` (`lib/core/utils/favicon_helper.dart`) with environment-safe conditional imports (`favicon_stub.dart` vs `favicon_web.dart`) to avoid breaking native Android/iOS compilation.
     - Integrated with `BootSequenceViewModel` to extract the Google Sheet profile image and inject it into the `<link rel="icon">` and `<link rel="apple-touch-icon">` tags using `dart:html` exactly when the app finishes analyzing Boot data.
 
+### Day 6 – March 31, 2026
+**Tasks completed:**
+- **Desktop Side Panels**: Expanded the desktop launcher scene beyond the centered phone frame with two outside panels while keeping the phone visually anchored in the middle.
+    - Added a left-side introduction card with time-aware greeting (`Good morning` / `Good afternoon` / `Good evening`), current local time, and a more practical positioning summary for Purnendu Samanta.
+    - Added supporting experience/craft chips to reinforce the 3+ years / Flutter / UI-first profile without disturbing the launcher itself.
+- **Portfolio Contact Flow**: Added a right-side contact form for desktop visitors.
+    - Implemented validated name, email, and message fields directly inside `MainDesktopLayout`.
+    - Wired the submit action to open the user's mail app with a prefilled draft to `joysamanta84@gmail.com`.
+    - Added a special inbound marker using a portfolio-specific subject/body flag (`[Portfolio Contact]`) so messages from the portfolio are immediately recognizable in the inbox.
+ - **Desktop Panel Refinement + Contact Reliability Pass**:
+    - Removed the "Focused hours" style copy and simplified the time chip to show only the current local time context.
+    - Replaced the uneven mini-metric chips with fuller-width experience stripes so the left panel feels more intentional and visually balanced.
+    - Removed the visible recipient label from the contact card.
+    - Updated the send action to clear all form fields after a successful compose launch and show a success notification.
+    - Improved web compatibility for the contact action by switching away from strict external-app launch and adding a Gmail compose fallback when direct `mailto:` launching is unavailable.
+ - **Web3Forms Contact Integration**:
+    - Replaced the `mailto:` / compose-window contact flow with direct form submission through Web3Forms using a dedicated `ContactService`.
+    - Added centralized Web3Forms endpoint/access-key constants and updated the desktop contact card to submit without redirecting visitors to Gmail or a local mail client.
+    - Added inline success/error feedback, disabled-button sending state, reply-to support, and a portfolio-specific source/subject marker for inbox clarity.
+ - **Desktop Content Sync + Layout Balancing**:
+    - Simplified the right contact card to a plain form-only presentation under the "Contact me" heading.
+    - Updated the desktop row so the left panel, phone frame, and right form all use the same computed height for a cleaner composition.
+    - Extended sheet parsing to support a dedicated `About` column and made CSV mapping header-based instead of relying only on fixed column positions.
+    - Wired the left desktop panel to fetch the About content dynamically from Google Sheets through the existing repository path.
+    - Replaced the large left-panel tiles with a compact icon-based tech stack section populated from the sheet's `TechStacks` values, with sensible fallbacks when data is missing.
+ - **Dynamic Tech Icon Support**:
+    - Added support for a new Google Sheet column `TechIcons`, parsed as a pipe-separated list of icon URLs per row.
+    - Extended `AppItem` to store `techIconUrls` so the desktop intro panel can render stack visuals directly from sheet data.
+    - Switched the left-panel tech section from text labels to icon-only badges.
+    - Added `flutter_svg` support so both SVG icon URLs and standard raster image URLs can render from the sheet.
+
 ---
 
 ## ⚠️ 5. Active Issues & Fixes Needed

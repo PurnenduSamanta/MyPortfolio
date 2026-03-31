@@ -8,9 +8,7 @@ class SheetService {
       throw Exception('Google Sheet URL not configured');
     }
 
-    final response = await http.get(
-      Uri.parse(AppLinks.googleSheetCsvUrl),
-    );
+    final response = await http.get(Uri.parse(AppLinks.googleSheetCsvUrl));
 
     if (response.statusCode == 200) {
       return _parseCsv(response.body);
@@ -23,14 +21,29 @@ class SheetService {
     final lines = csvData.split('\n');
     final items = <AppItem>[];
 
-    // Skip header row
+    if (lines.isEmpty) {
+      return items;
+    }
+
+    final headers = _parseCsvLine(
+      lines.first.trim(),
+    ).map((header) => header.trim().toLowerCase()).toList();
+
     for (int i = 1; i < lines.length; i++) {
       final line = lines[i].trim();
       if (line.isEmpty) continue;
 
       final columns = _parseCsvLine(line);
       if (columns.isNotEmpty) {
-        items.add(AppItem.fromCsvRow(columns));
+        if (headers.isNotEmpty && headers.length == columns.length) {
+          final row = <String, String>{};
+          for (int j = 0; j < headers.length; j++) {
+            row[headers[j]] = columns[j].trim();
+          }
+          items.add(AppItem.fromCsvMap(row));
+        } else {
+          items.add(AppItem.fromCsvRow(columns));
+        }
       }
     }
 
